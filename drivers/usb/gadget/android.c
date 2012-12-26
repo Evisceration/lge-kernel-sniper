@@ -1637,6 +1637,7 @@ void android_USB_disconnect(){
 #endif      
      spin_lock_irqsave(&cdev->lock, flags);  
      dev->disconnected = 1;  
+     dev->connected = 0; 
      schedule_work(&dev->work);  
      spin_unlock_irqrestore(&cdev->lock, flags);  
 }  
