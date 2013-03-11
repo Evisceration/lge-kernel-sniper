@@ -248,7 +248,7 @@ ifx_spi_open(struct tty_struct *tty, struct file *filp)
 		spi_data = spi_data_table[1];
 		break;
 	case 1: /* ttyspi1 */
-		spi_data = spi_data_table[0];
+		spi_data = spi_data_table[1];
 		break;
 	default:
 		spi_data = spi_data_table[0];
