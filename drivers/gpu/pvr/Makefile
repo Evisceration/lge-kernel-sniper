@@ -4,7 +4,6 @@ ccflags-$(CONFIG_PVR_SGXCORE_530) += -Idrivers/gpu/pvr -Idrivers/gpu/pvr/omap3 -
 ccflags-y += \
 	-DSUPPORT_SGX \
 	-DTRANSFER_QUEUE \
-	-DSGX_DYNAMIC_TIMING_INFO \
 	-DSUPPORT_HW_RECOVERY \
 	-DLDM_PLATFORM \
 	-DSUPPORT_SGX_NEW_STATUS_VALS \
