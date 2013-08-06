@@ -659,6 +659,9 @@ void muic_udelay(u32 microsec)
 {
 	u32 microseconds;
 	microseconds = microsec;
+	if(microseconds > 20000)
+	mdelay(microseconds/1000);
+	else
 	udelay(microseconds);
 }
 
