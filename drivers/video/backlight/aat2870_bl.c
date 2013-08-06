@@ -38,7 +38,9 @@
 #include <linux/hrtimer.h>
 
 #ifdef CONFIG_HAS_EARLYSUSPEND
-#include <linux/earlysuspend.h>
+// DARK-MOD: no early suspend
+#undef CONFIG_HAS_EARLYSUSPEND
+// #include <linux/earlysuspend.h>
 #endif
 
 #define MODULE_NAME		"aat2870"
@@ -733,6 +735,8 @@ static void aat2870_set_main_current_level(struct i2c_client *client, int level)
 	//DBG("level = %d\n", level);
 
 	dev = (struct aat2870_device *) i2c_get_clientdata(client);
+        if (!dev->bl_resumed)
+                return;
 #if 0  // 20120814 sangki.hyun@lge.com ICS Backlight tunning
 	if (cur_main_lcd_level ==level)
 		return;
@@ -757,11 +761,14 @@ static void aat2870_set_main_current_level(struct i2c_client *client, int level)
 
 	// LGE_B_DOM_S 2011218 kyungrae.jo@lge.com, use max current
 	//max 25.2mA, min 1.8mA
-	if(level > 30)
-		val = (unsigned char)(level * 28 / 255);
-	else
-		val = (unsigned char)(level * 2 / 30);
+//  if(level > 30)
+//    val = (unsigned char)(level * 28 / 255);
+//  else
+//    val = (unsigned char)(level * 2 / 30);
 	// LGE_B_DOM_E 2011218 kyungrae.jo@lge.com, use max current
+
+               // max val wanted is 0x1F = 31, minimum is zero (not off, but minimum voltage)
+               val = (unsigned char) (level * 0x1F / 255);
 	
 	val = 0xE0 | val;
 
@@ -854,12 +861,18 @@ static void aat2870_backlight_on(struct i2c_client *client)
 	else
 	{
 		DBG("als_mode=%d \n",dev->mode);
+#ifdef CONFIG_HAS_EARLYSUSPEND
 		cur_main_lcd_level = early_bl_value;
+#endif
 		aat2870_change_mode(client,dev->mode,1);
 	}
 	//2011.5.24 LG_CHANGE_S lee.hyunji@lge.com TD1396000761: kakao talk popup
     if (early_bl_timer==0||dev->state==SLEEP_STATE)
-		aat2870_write_reg(client, AAT2870_REG0, 0xff); 
+		aat2870_write_reg(client, AAT2870_REG0, 0xff);
+#else
+    if (dev->state==SLEEP_STATE)
+    aat2870_write_reg(client, AAT2870_REG0, 0xff); 
+#endif 
     //2011.5.24 LG_CHANGE_E lee.hyunji@lge.com TD1396000761: kakao talk popup		
 	dev->state = WAKE_STATE;
 
@@ -982,11 +995,14 @@ static void aat2870_change_mode(struct i2c_client *client, int mode, int force)
 	 * write/read Bit = 1. 
 	 */
 
+      #ifdef CONFIG_HAS_EARLYSUSPEND
 	if (early_bl_timer!=1)
 	{
 		dev->mode=mode;
 		return;
 	}
+#else
+#endif
     if (mode==ALS_MODE)
     {
     	mode=POWERSAVE_MODE; //ALS_MODE == POWERSAVE_MODE
@@ -1078,7 +1094,11 @@ static enum hrtimer_restart als_timer_func(struct hrtimer *timer)
 	DBG("\n");
 	queue_work(drvdata->als_wq, &drvdata->als_work);
 	
-	if ((drvdata->mode==ALS_MODE)&&(early_bl_timer==1))
+	if ((drvdata->mode==ALS_MODE)
+#ifdef CONFIG_HAS_EARLYSUSPEND
+     &&(early_bl_timer==1)
+#endif
+)
 		{
 	
 		hrtimer_start(&drvdata->als_timer, ktime_set(0,500000000), HRTIMER_MODE_REL); /* 250msec */
@@ -1326,6 +1346,8 @@ ssize_t aat2870_show_alsgain_control(struct device *dev,
 	return r;
 }
 
+int display_brightness_prior_off = 0;
+
 ssize_t aat2870_store_onoff_control(struct device *dev, 
 			  struct device_attribute *attr, 
 			  const char *buf, 
@@ -1338,7 +1360,11 @@ ssize_t aat2870_store_onoff_control(struct device *dev,
 		return -EINVAL;
 	}
 
+#ifdef CONFIG_HAS_EARLYSUSPEND
 	DBG("cur_main_lcd_level=%d early_bl_value=%d\n",cur_main_lcd_level,early_bl_value);
+#else
+        DBG("cur_main_lcd_level=%d \n",cur_main_lcd_level);
+#endif
 
 	drvdata = dev_get_drvdata(dev->parent);
 
@@ -1347,22 +1373,38 @@ ssize_t aat2870_store_onoff_control(struct device *dev,
 
 	if (value==0)//off
 	{
+                      DBG("DISPLAY=off cur_main_lcd_level=%d\n", cur_main_lcd_level);
+                            display_brightness_prior_off = cur_main_lcd_level;
+
 		aat2870_backlight_off(drvdata->client);
 		aat2870_write_reg(drvdata->client, AAT2870_REG0, 0x00);
 	}
 	else if (value==1)//on
 	{
+                      if (drvdata->state == WAKE_STATE) {
+                        DBG("DISPLAY=stays on\n");
+                  return count;
+                      }
+
+               DBG("DISPLAY=on\n");
+
+               drvdata->bl_resumed=1; // so set_main_current_level will work
+
+               aat2870_set_main_current_level(drvdata->client, display_brightness_prior_off);
+
 		aat2870_write_reg(drvdata->client, AAT2870_REG0, 0xff);
 	//	early_bl_value=150;
-	//	aat2870_backlight_on(drvdata->client);
+              aat2870_backlight_on(drvdata->client);
 	}
 	else if (value==2)//shutdown
 	{
+                      DBG("DISPLAY=shutdown\n");
 		aat2870_write_reg(drvdata->client, LDO_ABCD_EN_REG, 0x00);
 		gpio_direction_output(LCD_CP_EN, 0);		
 	}
 	else if (value==3)//on after shutdown
 	{
+                      DBG("DISPLAY=restart\n");
 		aat2870_device_init(drvdata->client);
 		aat2870_write_reg(drvdata->client, LDO_AB_LEVEL_REG, 0x4A);
 		aat2870_write_reg(drvdata->client, LDO_CD_LEVEL_REG, 0x4C);
@@ -1395,7 +1437,9 @@ static int aat2870_remove(struct i2c_client *i2c_dev)
 
 	dev = (struct aat2870_device *) i2c_get_clientdata(i2c_dev);
 
+#ifdef CONFIG_HAS_EARLYSUSPEND
 	unregister_early_suspend(&dev->early_suspend);
+#endif
 
 	gpio_free(LCD_CP_EN);
 

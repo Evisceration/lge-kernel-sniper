@@ -2,7 +2,7 @@
  * for MPU and CORE voltages
  */
 
-#define OMAP3630_VDD_MPU_OPP50_UV               980000
+#define OMAP3630_VDD_MPU_OPP50_UV               975000
 #define OMAP3630_VDD_MPU_OPP100_UV              1162500
 #define OMAP3630_VDD_MPU_OPP120_UV              1325000
 #define OMAP3630_VDD_MPU_OPP1G_UV               1425000
