@@ -85,9 +85,10 @@ struct omap_vdd_dep_info omap34xx_vddmpu_dep_info[] = {
 
 #if 0
 #define OMAP3630_VDD_MPU_OPP50_UV		980000
-#define OMAP3630_VDD_MPU_OPP100_UV		1200000
+#define OMAP3630_VDD_MPU_OPP100_UV		1100000
 #define OMAP3630_VDD_MPU_OPP120_UV		1325000
 #define OMAP3630_VDD_MPU_OPP1G_UV		1375000
+#define OMAP3630_VDD_MPU_OPP2G_UV		1425000
 #endif
 
 struct omap_volt_data omap36xx_vddmpu_volt_data[] = {
@@ -99,6 +100,7 @@ struct omap_volt_data omap36xx_vddmpu_volt_data[] = {
 	VOLT_DATA_DEFINE(OMAP3630_VDD_MPU_OPP100_UV, 100000, OMAP3630_CONTROL_FUSE_OPP100_VDD1, 0xf9, 0x16, OMAP_ABB_NOMINAL_OPP),
 	VOLT_DATA_DEFINE(OMAP3630_VDD_MPU_OPP120_UV, 100000, OMAP3630_CONTROL_FUSE_OPP120_VDD1, 0xfa, 0x23, OMAP_ABB_NOMINAL_OPP),
 	VOLT_DATA_DEFINE(OMAP3630_VDD_MPU_OPP1G_UV, 100000, OMAP3630_CONTROL_FUSE_OPP1G_VDD1, 0xfa, 0x27, OMAP_ABB_FAST_OPP),
+	VOLT_DATA_DEFINE(OMAP3630_VDD_MPU_OPP2G_UV, 100000, OMAP3630_CONTROL_FUSE_OPP2G_VDD1, 0xfa, 0x27, OMAP_ABB_FAST_OPP),
 	// LGE_MOD_E 20121117 subum.choi@lge.com		// MPU H/W Reset patch from deepak
 	VOLT_DATA_DEFINE(0, 0, 0, 0, 0, 0),
 };
@@ -166,7 +168,9 @@ static struct omap_opp_def __initdata omap36xx_opp_def_list[] = {
 				800000000, OMAP3630_VDD_MPU_OPP120_UV),
 	/* MPU OPP4 - OPP-SB */
 	OPP_INITIALIZER("mpu", "dpll1_ck", "mpu_iva", true,
-				1200000000, OMAP3630_VDD_MPU_OPP1G_UV),
+				1000000000, OMAP3630_VDD_MPU_OPP1G_UV),
+	OPP_INITIALIZER("mpu", "dpll1_ck", "mpu_iva", true,
+				1200000000, OMAP3630_VDD_MPU_OPP2G_UV),
 
 /* S[, 2012.07.02, mannsik.chung@lge.com, Boost L3 clock. (TI patch by deepak.muddegowda@sasken.com) */
 #if 0
@@ -204,6 +208,7 @@ static struct omap_vdd_dep_volt omap36xx_vdd_mpu_core_dep_data[] = {
 	{.main_vdd_volt = OMAP3630_VDD_MPU_OPP100_UV, .dep_vdd_volt = OMAP3630_VDD_CORE_OPP100_UV},
 	{.main_vdd_volt = OMAP3630_VDD_MPU_OPP120_UV, .dep_vdd_volt = OMAP3630_VDD_CORE_OPP100_UV},
 	{.main_vdd_volt = OMAP3630_VDD_MPU_OPP1G_UV, .dep_vdd_volt = OMAP3630_VDD_CORE_OPP100_UV},
+	{.main_vdd_volt = OMAP3630_VDD_MPU_OPP2G_UV, .dep_vdd_volt = OMAP3630_VDD_CORE_OPP100_UV},
 };
 
 struct omap_vdd_dep_info omap36xx_vddmpu_dep_info[] = {
