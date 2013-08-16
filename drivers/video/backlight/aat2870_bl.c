@@ -1,6 +1,6 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
  *  * vim: set ts=8 sw=8 et tw=80:
- *   
+ *
 * drivers/video/backlight/aat2870_bl.c
  *
  * Copyright (C) 2010 LGE, Inc
@@ -17,11 +17,11 @@
  */
 
 /*******************************************************************************
- * Keep coding stype necessarily 
+ * Keep coding stype necessarily
  * -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
  *  * vim: set ts=8 sw=8 et tw=80:
  *
- ******************************************************************************/ 
+ ******************************************************************************/
 #include <linux/platform_device.h>
 #include <linux/module.h>
 #include <linux/device.h>
@@ -52,14 +52,14 @@
 #ifdef DEBUG
 #define DBG(fmt, args...) 				\
 	printk(KERN_DEBUG "[%s] %s(%d): " 		\
-		fmt, MODULE_NAME, __func__, __LINE__, ## args); 
+		fmt, MODULE_NAME, __func__, __LINE__, ## args);
 #else	/* DEBUG */
-#define DBG(...) 
+#define DBG(...)
 #endif
 
 #define ERR(fmt, args...) 				\
 	printk(KERN_ERR "[%s] %s(%d): " 		\
-		fmt, MODULE_NAME, __func__, __LINE__, ## args); 
+		fmt, MODULE_NAME, __func__, __LINE__, ## args);
 
 
  struct i2c_client *aat2870_i2c_client;
@@ -72,7 +72,7 @@ extern void bd2802_resume_for_lcd(void); //2011205 kyungyoon.kim@lge.com lcd res
 extern unsigned int system_rev;
 
 #define MAX_BRIGHTNESS 		31
-#define DEFAULT_BRIGHTNESS 	14 
+#define DEFAULT_BRIGHTNESS 	14
 #define USER_LVL_MAX		255
 
 #define AAT2870_REG0		0x00
@@ -145,14 +145,14 @@ enum {
 	SLEEP_STATE,	// backlight off
 	WAKE_STATE,	// backlight on
 };
-	
+
 struct aat2870_device {
 	struct i2c_client *client;
 	struct backlight_device *bl_dev;
 	struct led_classdev *led;
 	struct hrtimer als_timer;
 	struct work_struct  als_work;
-	struct workqueue_struct	 	*als_wq;	
+	struct workqueue_struct	 	*als_wq;
 
 	int level;
 	int state;
@@ -164,12 +164,12 @@ struct aat2870_device {
 	int als_register38;
 	/* 20110216 seven.kim@lge.com to check AAT2870 LDO_ABCD_EN_REG [START] */
 	int als_level;
-    //20100205 kyungyoon.kim@lge.com for LCD resume speed[START]	
+    //20100205 kyungyoon.kim@lge.com for LCD resume speed[START]
 	int bl_resumed;
     //20100205 kyungyoon.kim@lge.com for LCD resume speed[END]
 
 #ifdef CONFIG_HAS_EARLYSUSPEND
-	struct early_suspend early_suspend; 
+	struct early_suspend early_suspend;
 #endif
 };
 
@@ -316,7 +316,7 @@ static const struct i2c_device_id aat2870_bl_id[] = {
 	{ },	// 20100526 sookyoung.kim@lge.com
 };
 
-static int aat2870_write_reg(struct i2c_client *client, 
+static int aat2870_write_reg(struct i2c_client *client,
 			     unsigned char reg,
 			     unsigned char val);
 static int aat2870_read_reg(struct i2c_client *client,
@@ -339,15 +339,15 @@ enum {
 	AAT2870_EARLY_SUSPEND_STATE,
 	AAT2870_SUSPEND_STATE,
 	AAT2870_RESUME_STATE,
-	AAT2870_LATE_RESUME_STATE,	
+	AAT2870_LATE_RESUME_STATE,
 };
 /* 20110218 seven.kim@lge.com to contorl AAT2870 sleep/resume state machine [START] */
 
-static int aat2870_write_reg(struct i2c_client *client, 
+static int aat2870_write_reg(struct i2c_client *client,
 			     unsigned char reg,
 			     unsigned char val)
 {
-	struct aat2870_device *dev = NULL;	
+	struct aat2870_device *dev = NULL;
 	int ret;
 	int status = 0;
 
@@ -367,7 +367,7 @@ static int aat2870_write_reg(struct i2c_client *client,
 	if (reg == LDO_ABCD_EN_REG)
 		dev->als_register38 = val;
 	/* 20110216 seven.kim@lge.com to check AAT2870 LDO_ABCD_EN_REG [END] */
-	
+
 	ret = i2c_smbus_write_byte_data(client, reg, val);
 	if (ret != 0) {
 		status = -EIO;
@@ -378,14 +378,14 @@ static int aat2870_write_reg(struct i2c_client *client,
 }
 
 
-static int aat2870_read_reg(struct i2c_client *client, 
-			    unsigned char reg, 
+static int aat2870_read_reg(struct i2c_client *client,
+			    unsigned char reg,
 			    unsigned char *pval)
 {
 	int ret;
 	int status = 0;
 
-	if (client == NULL) { 
+	if (client == NULL) {
 		ERR("client is null\n");
 		return -ENXIO;
 	}
@@ -405,7 +405,7 @@ static void aat2870_hw_reset(void)
 {
 	/*20110216 seven.kim@lge.com to adjust android sleep flow [START] */
 	if(aat2870_ldo_status() == 0) //all LDOs are off
-   {	
+   {
 	gpio_set_value(LCD_CP_EN, 0);
 	udelay(10);
 	gpio_set_value(LCD_CP_EN, 1);
@@ -414,7 +414,7 @@ static void aat2870_hw_reset(void)
 	/*20110216 seven.kim@lge.com to adjust android sleep flow [END] */
 }
 
-static void aat2870_device_init(struct i2c_client *client) 
+static void aat2870_device_init(struct i2c_client *client)
 {
 ////	gpio_request(LCD_CP_EN, "lcd bl");
 ////	gpio_direction_output(LCD_CP_EN, 1);
@@ -422,20 +422,20 @@ static void aat2870_device_init(struct i2c_client *client)
 	aat2870_hw_reset();
 }
 
-void aat2870_ldo_enable(unsigned char num, int enable) 
+void aat2870_ldo_enable(unsigned char num, int enable)
 {
 	unsigned char org;
 
 	aat2870_read_reg(aat2870_i2c_client, LDO_ABCD_EN_REG, &org);
 
 	if (enable) {
-		aat2870_write_reg(aat2870_i2c_client, 
+		aat2870_write_reg(aat2870_i2c_client,
 				LDO_ABCD_EN_REG,
 				org | (1<< num));
 	}
 	else {
-		aat2870_write_reg(aat2870_i2c_client, 
-				LDO_ABCD_EN_REG, 
+		aat2870_write_reg(aat2870_i2c_client,
+				LDO_ABCD_EN_REG,
 				org & ~(1<<num));
 	}
 }
@@ -559,15 +559,15 @@ EXPORT_SYMBOL(aat2870_set_ldo);
 #if defined(CONFIG_MACH_LGE_HUB) || defined(CONFIG_MACH_LGE_SNIPER)
 void aat2870_touch_ldo_enable(struct i2c_client *client, int on)
 {
-	if(on) 
+	if(on)
 	{
 		DBG("touch enable..\n");
-		
-		/*20110214 seven.kim@lge.com to adjust touch ldo control [START] */	
+
+		/*20110214 seven.kim@lge.com to adjust touch ldo control [START] */
 		if(gpio_get_value(LCD_CP_EN) == 0)					/*20110305 seven.kim@lge.com late_resume_lcd [START] */
 		{
 			gpio_set_value(LCD_CP_EN, 1);
-			udelay(80); 
+			udelay(80);
 		}
 		aat2870_write_reg(client, LDO_AB_LEVEL_REG, 0x4A);
 		mdelay(1);											/*20110305 seven.kim@lge.com late_resume_lcd [END] */
@@ -575,14 +575,14 @@ void aat2870_touch_ldo_enable(struct i2c_client *client, int on)
 		mdelay(1);
 		aat2870_write_reg(client, LDO_ABCD_EN_REG, 0x0F);
 		mdelay(1);
-		/*20110214 seven.kim@lge.com to adjust touch ldo control [END] */	
+		/*20110214 seven.kim@lge.com to adjust touch ldo control [END] */
 	}
-	else 
+	else
 	{
 		DBG("touch disable..\n");
-		/*20110214 seven.kim@lge.com to adjust touch ldo control [START] */	
+		/*20110214 seven.kim@lge.com to adjust touch ldo control [START] */
 		aat2870_write_reg(client, LDO_ABCD_EN_REG, 0x03);
-		/*20110214 seven.kim@lge.com to adjust touch ldo control [END] */	
+		/*20110214 seven.kim@lge.com to adjust touch ldo control [END] */
 	}
 
 }
@@ -591,7 +591,7 @@ EXPORT_SYMBOL(aat2870_touch_ldo_enable); //20101222 seven.kim@lge.com for touch 
 static void aat2870_lcd_ldo_enable(struct i2c_client *client, int on)
 {
 	DBG("on=%d\n",on);
-	if(on) 
+	if(on)
 	{
 		aat2870_write_reg(client, LDO_AB_LEVEL_REG, 0x4A);
 		mdelay(1);
@@ -600,7 +600,7 @@ static void aat2870_lcd_ldo_enable(struct i2c_client *client, int on)
 		aat2870_write_reg(client, LDO_ABCD_EN_REG, 0x0F);
 		mdelay(1);
 	}
-	else 
+	else
 	{
 	        aat2870_write_reg(client, LDO_ABCD_EN_REG, 0x00);
 		mdelay(1);
@@ -624,7 +624,7 @@ void hub_lcd_initialize(void)
 	aat2870_lcd_ldo_enable(aat2870_i2c_client,1);
 	mdelay(40);
         gpio_set_value(HUB_PANEL_LCD_RESET_N,1);
-	mdelay(10); 
+	mdelay(10);
 	if (mp3_playing==1)
 	{
 		aat2870_write_reg(aat2870_i2c_client, LDO_AB_LEVEL_REG, 0x4A);
@@ -639,7 +639,7 @@ void hub_lcd_initialize(void)
 	udelay(10);
 	gpio_set_value(LCD_CP_EN, 1);
 	udelay(80); /*optimised value for low-temperature condition*/
-	
+
 	aat2870_write_reg(aat2870_i2c_client, LDO_AB_LEVEL_REG, 0x4A);
 	mdelay(1);
 	aat2870_write_reg(aat2870_i2c_client, LDO_CD_LEVEL_REG, 0x4C);
@@ -655,7 +655,7 @@ int aat2870_ldo_status(void)
 {
 	struct aat2870_device *dev;
 	dev = i2c_get_clientdata(aat2870_i2c_client);
-	
+
 	return dev->als_register38;
 }
 /* 20110216 seven.kim@lge.com to check AAT2870 LDO_ABCD_EN_REG [END] */
@@ -665,62 +665,62 @@ void aat2870_shutdown(void)
     DBG("aat2870_shutdown ..\n");
 
     aat2870_write_reg(aat2870_i2c_client, LDO_ABCD_EN_REG, 0x00);
-    mdelay(1);   	
+    mdelay(1);
 
     dev = i2c_get_clientdata(aat2870_i2c_client);
     dev->bl_resumed = 0;
-	
+
     gpio_direction_output(LCD_CP_EN, 0);
-   
+
 	check_bl_shutdown=1;
 }
 EXPORT_SYMBOL(aat2870_shutdown);
 #endif
 
 
-/* 
- * Main/Sub/Aux Backlight LED Current - BLM/BLS/BL[n][4:0] 
+/*
+ * Main/Sub/Aux Backlight LED Current - BLM/BLS/BL[n][4:0]
 
 Tab size : 8
 
 --------------------------------------------------------------------
-Bit4	Bit3	Bit2	Bit1	Bit0	LED Current (mA) 
+Bit4	Bit3	Bit2	Bit1	Bit0	LED Current (mA)
 --------------------------------------------------------------------
-BLM[4]	BLM[3]	BLM[2]	BLM[1]	BLM[0]	REG1 
-BLS[4]  BLM[3]  BLS[2]  BLS[1]  BLS[0]  REG2 
+BLM[4]	BLM[3]	BLM[2]	BLM[1]	BLM[0]	REG1
+BLS[4]  BLM[3]  BLS[2]  BLS[1]  BLS[0]  REG2
 BL[n]	BL[n]	BL[n]	BL[n]	BL[n]	REG3 to REG10
 --------------------------------------------------------------------
-0	0	0	0	0	0.45 
-0	0	0	0	1	0.9 
-0	0	0	1	0	1.8 
-0	0	0	1	1	2.7 
-0	0	1	0	0	3.6 
-0	0	1	0	1	4.5 
-0	0	1	1	0	5.4 
-0	0	1	1	1	6.3 
-0	1	0	0	0	7.2 
-0	1	0	0	1	8.1 
-0	1	0	1	0	9.0 
-0	1	0	1	1	9.9 
-0	1	1	0	0	10.8 
-0	1	1	0	1	11.7 
-0	1	1	1	0	12.6 
-0	1	1	1	1	13.5 
-1	0	0	0	0	14.4 
-1	0	0	0	1	15.3 
-1	0	0	1	0	16.2 
-1	0	0	1	1	17.1 
-1	0	1	0	0	18.0 
-1	0	1	0	1	18.9 
-1	0	1	1	0	19.8 
-1	0	1	1	1	20.7 
-1	1	0	0	0	21.6 
-1	1	0	0	1	22.5 
-1	1	0	1	0	23.4 
-1	1	0	1	1	24.3 
-1	1	1	0	0	25.2 
-1	1	1	0	1	26.1 
-1	1	1	1	0	27.0 
+0	0	0	0	0	0.45
+0	0	0	0	1	0.9
+0	0	0	1	0	1.8
+0	0	0	1	1	2.7
+0	0	1	0	0	3.6
+0	0	1	0	1	4.5
+0	0	1	1	0	5.4
+0	0	1	1	1	6.3
+0	1	0	0	0	7.2
+0	1	0	0	1	8.1
+0	1	0	1	0	9.0
+0	1	0	1	1	9.9
+0	1	1	0	0	10.8
+0	1	1	0	1	11.7
+0	1	1	1	0	12.6
+0	1	1	1	1	13.5
+1	0	0	0	0	14.4
+1	0	0	0	1	15.3
+1	0	0	1	0	16.2
+1	0	0	1	1	17.1
+1	0	1	0	0	18.0
+1	0	1	0	1	18.9
+1	0	1	1	0	19.8
+1	0	1	1	1	20.7
+1	1	0	0	0	21.6
+1	1	0	0	1	22.5
+1	1	0	1	0	23.4
+1	1	0	1	1	24.3
+1	1	1	0	0	25.2
+1	1	1	0	1	26.1
+1	1	1	1	0	27.0
 1	1	1	1	1	27.9
 --------------------------------------------------------------------
 */
@@ -736,8 +736,8 @@ static void aat2870_set_main_current_level(struct i2c_client *client, int level)
 #if 0  // 20120814 sangki.hyun@lge.com ICS Backlight tunning
 	if (cur_main_lcd_level ==level)
 		return;
-#endif	
-	cur_main_lcd_level = level; 
+#endif
+	cur_main_lcd_level = level;
 	dev->bl_dev->props.brightness = cur_main_lcd_level;
 
  //2011.5.24 LG_CHANGE_S lee.hyunji@lge.com TD1396000761: kakao talk popup
@@ -757,12 +757,12 @@ static void aat2870_set_main_current_level(struct i2c_client *client, int level)
 
 	// LGE_B_DOM_S 2011218 kyungrae.jo@lge.com, use max current
 	//max 25.2mA, min 1.8mA
-	if(level > 30)
-		val = (unsigned char)(level * 28 / 255);
+	if(level > 85)
+	  val = (unsigned char)((level * 33 / 255)-6);
 	else
-		val = (unsigned char)(level * 2 / 30);
+	  val = (unsigned char)(level * 15 / 255);
 	// LGE_B_DOM_E 2011218 kyungrae.jo@lge.com, use max current
-	
+
 	val = 0xE0 | val;
 
 	DBG("fisrt val = 0x%x\n", val);
@@ -775,7 +775,7 @@ static void aat2870_set_main_current_level(struct i2c_client *client, int level)
 		udelay(80);
 	}
 	// 20120829 sangki.hyun@lge.com backlight i2c failed }
-	
+
 	aat2870_write_reg(client, AAT2870_REG1, val);
 
 	// TODO : check mdelay
@@ -783,7 +783,7 @@ static void aat2870_set_main_current_level(struct i2c_client *client, int level)
 }
 
 
-static void leds_brightness_set(struct led_classdev *led_cdev, 
+static void leds_brightness_set(struct led_classdev *led_cdev,
 				enum led_brightness value)
 {
 	// struct aat2870_device *dev = dev_get_drvdata(led_cdev->dev->parent); // 20120213 taeju.park@lge.com To delete compile warning, unused variable.
@@ -813,7 +813,7 @@ static void leds_brightness_set(struct led_classdev *led_cdev,
 	else
 	{
 	aat2870_set_main_current_level(dev->client, value);
-	cur_main_lcd_level = value; 
+	cur_main_lcd_level = value;
 	}
     */
     // LGE_CHANGE_E [park.joonhyuk@lge.com 2011. 4. 4] set the brightness level when system using ALS Mode
@@ -838,7 +838,7 @@ static void aat2870_backlight_on(struct i2c_client *client)
 	printk("received (prev bl_status: %s)\n", dev->state ? "ON" : "OFF");
 //	mdelay(100); //2011.5.24 LG_CHANGE lee.hyunji@lge.com TD1396000761: kakao talk popup
 
-	if (dev->state == WAKE_STATE) 
+	if (dev->state == WAKE_STATE)
 		return;
 
 	mdelay(100); //2011.5.24 LG_CHANGE lee.hyunji@lge.com TD1396000761: kakao talk popup
@@ -859,8 +859,8 @@ static void aat2870_backlight_on(struct i2c_client *client)
 	}
 	//2011.5.24 LG_CHANGE_S lee.hyunji@lge.com TD1396000761: kakao talk popup
     if (early_bl_timer==0||dev->state==SLEEP_STATE)
-		aat2870_write_reg(client, AAT2870_REG0, 0xff); 
-    //2011.5.24 LG_CHANGE_E lee.hyunji@lge.com TD1396000761: kakao talk popup		
+		aat2870_write_reg(client, AAT2870_REG0, 0xff);
+    //2011.5.24 LG_CHANGE_E lee.hyunji@lge.com TD1396000761: kakao talk popup
 	dev->state = WAKE_STATE;
 
 	return;
@@ -872,12 +872,12 @@ static void aat2870_backlight_off(struct i2c_client *client)
 
 	dev = i2c_get_clientdata(client);
 
-	if (dev->state == SLEEP_STATE) 
+	if (dev->state == SLEEP_STATE)
 		return;
 
 	saved_main_lcd_level = cur_main_lcd_level;
 	aat2870_set_main_current_level(client, 0);
-	dev->state = SLEEP_STATE;	
+	dev->state = SLEEP_STATE;
 
 	return;
 }
@@ -897,8 +897,8 @@ static int aat2870_bl_set_intensity(struct backlight_device *bd)
 
 	aat2870_set_main_current_level(client, bd->props.brightness);
 
-	cur_main_lcd_level = bd->props.brightness; 
-	
+	cur_main_lcd_level = bd->props.brightness;
+
 	return 0;
 }
 
@@ -915,8 +915,8 @@ static int aat2870_bl_get_intensity(struct backlight_device *bd)
 }
 
 
-ssize_t lcd_backlight_show_level(struct device *dev, 
-				 struct device_attribute *attr, 
+ssize_t lcd_backlight_show_level(struct device *dev,
+				 struct device_attribute *attr,
 				 char *buf)
 {
 	int r;
@@ -925,12 +925,12 @@ ssize_t lcd_backlight_show_level(struct device *dev,
 			"LCD Backlight Level is : %d\n", cur_main_lcd_level);
 
 	DBG("buf = %s\n", buf);
-	
+
 	return r;
 }
 
 
-ssize_t lcd_backlight_store_level(struct device *dev, 
+ssize_t lcd_backlight_store_level(struct device *dev,
 				  struct device_attribute *attr,
 				  const char *buf,
 				  size_t count)
@@ -942,17 +942,17 @@ ssize_t lcd_backlight_store_level(struct device *dev,
 		return -EINVAL;
 
 	DBG("buf = %s\n", buf);
-	
+
 	level = simple_strtoul(buf, NULL, 10);
-	
+
 	if (level > USER_LVL_MAX)
 		level = USER_LVL_MAX;
 
 	DBG("level = %d\n", level);
 
 	aat2870_set_main_current_level(drvdata->client, level);
-	cur_main_lcd_level = level; 
-	
+	cur_main_lcd_level = level;
+
 	return count;
 }
 
@@ -972,14 +972,14 @@ static void aat2870_change_mode(struct i2c_client *client, int mode, int force)
 	als_optimize_seq = normal_to_als_optimize_mode;//changhyun.han@lge.com, 20100119 ,added the optimized brightness mode
 
 	/*
-	 * The external ambient light sensor is powered by the SBIAS output 
-	 * which is a programmable voltage linear regulator which can provide 
-	 * up to 30mA for the sensor bias.  The SBIAS output voltage may be 
-	 * programmed and enabled by REG15 Bit 0, Bit 1 and Bit 2.  
+	 * The external ambient light sensor is powered by the SBIAS output
+	 * which is a programmable voltage linear regulator which can provide
+	 * up to 30mA for the sensor bias.  The SBIAS output voltage may be
+	 * programmed and enabled by REG15 Bit 0, Bit 1 and Bit 2.
 	 * REG14 alco provides programming bits to set up ALC circuit and REG16
-	 * for configuring polling times to save system power.  
-	 * To read ALC sensor data, write to IC address 60h with 
-	 * write/read Bit = 1. 
+	 * for configuring polling times to save system power.
+	 * To read ALC sensor data, write to IC address 60h with
+	 * write/read Bit = 1.
 	 */
 
 	if (early_bl_timer!=1)
@@ -991,7 +991,7 @@ static void aat2870_change_mode(struct i2c_client *client, int mode, int force)
     {
     	mode=POWERSAVE_MODE; //ALS_MODE == POWERSAVE_MODE
     }
-	
+
 	if (force == 0)
 	{
 	if (mode ==dev->mode)
@@ -1001,9 +1001,9 @@ static void aat2870_change_mode(struct i2c_client *client, int mode, int force)
 	}
 	}
 
-	if (mode == ALS_MODE) 
+	if (mode == ALS_MODE)
 	{
-		for (i = 0; als_seq[i].reg != I2C_NO_REG; i++) 
+		for (i = 0; als_seq[i].reg != I2C_NO_REG; i++)
 		{
 			aat2870_write_reg(client,als_seq[i].reg, als_seq[i].val);
 			DBG("reg =0x%x, val=0x%x\n",als_seq[i].reg,als_seq[i].val);
@@ -1012,9 +1012,9 @@ static void aat2870_change_mode(struct i2c_client *client, int mode, int force)
 			mdelay(5);
 		dev->mode=ALS_MODE;
 	}
-	else if (mode == NORMAL_MODE) 
+	else if (mode == NORMAL_MODE)
 	{
-		for (i = 0; normal_seq[i].reg != I2C_NO_REG; i++) 
+		for (i = 0; normal_seq[i].reg != I2C_NO_REG; i++)
 		{
 			aat2870_write_reg(client,normal_seq[i].reg, normal_seq[i].val);
 			mdelay(1);
@@ -1025,7 +1025,7 @@ static void aat2870_change_mode(struct i2c_client *client, int mode, int force)
 	}
 	else if (mode == POWERSAVE_MODE) //changhyun.han@lge.com, 20100119 ,added the optimized brightness mode
 	{
-		for (i = 0; als_seq[i].reg != I2C_NO_REG; i++) 
+		for (i = 0; als_seq[i].reg != I2C_NO_REG; i++)
 		{
 			aat2870_write_reg(client,als_seq[i].reg, als_seq[i].val);
 			mdelay(1);
@@ -1033,9 +1033,9 @@ static void aat2870_change_mode(struct i2c_client *client, int mode, int force)
 			mdelay(5);
 		dev->mode=ALS_MODE;//ALS is Powersave mode
 	}
-	else if (mode == OPTIMIZE_MODE) 
+	else if (mode == OPTIMIZE_MODE)
 	{
-		for (i = 0; als_optimize_seq[i].reg != I2C_NO_REG; i++) 
+		for (i = 0; als_optimize_seq[i].reg != I2C_NO_REG; i++)
 		{
 			aat2870_write_reg(client,als_optimize_seq[i].reg, als_optimize_seq[i].val);
 			mdelay(1);
@@ -1058,7 +1058,7 @@ static void als_work_func(struct work_struct *work)
 {
 	struct aat2870_device *drvdata = container_of(work, struct aat2870_device, als_work);
 	unsigned char val = 0;
-	
+
 	/* 20110305 seven.kim@lge.com late_resume_lcd [START] */
 	if(gpio_get_value(LCD_CP_EN) == 0)
 		printk("%s : CP EN is LOW \n",__func__);
@@ -1077,10 +1077,10 @@ static enum hrtimer_restart als_timer_func(struct hrtimer *timer)
 
 	DBG("\n");
 	queue_work(drvdata->als_wq, &drvdata->als_work);
-	
+
 	if ((drvdata->mode==ALS_MODE)&&(early_bl_timer==1))
 		{
-	
+
 		hrtimer_start(&drvdata->als_timer, ktime_set(0,500000000), HRTIMER_MODE_REL); /* 250msec */
 		}
 
@@ -1089,8 +1089,8 @@ static enum hrtimer_restart als_timer_func(struct hrtimer *timer)
 }
 
 
-ssize_t aat2870_show_als(struct device *dev, 
-			 struct device_attribute *attr, 
+ssize_t aat2870_show_als(struct device *dev,
+			 struct device_attribute *attr,
 			 char *buf)
 {
 	struct aat2870_device *drvdata = dev_get_drvdata(dev->parent);
@@ -1108,15 +1108,15 @@ ssize_t aat2870_show_als(struct device *dev,
 	else
 			r = snprintf(buf, PAGE_SIZE, "%s\n","0");
 #else
-	r = snprintf(buf, PAGE_SIZE, "%s\n", 
+	r = snprintf(buf, PAGE_SIZE, "%s\n",
 			(drvdata->mode == ALS_MODE) ? "1" : "0");
 #endif
 	return r;
 }
 
 //changhyun.han@lge.com, 20100119 ,added the optimized brightness mode
-ssize_t aat2870_show_als_option(struct device *dev, 
-			 struct device_attribute *attr, 
+ssize_t aat2870_show_als_option(struct device *dev,
+			 struct device_attribute *attr,
 			 char *buf)
 {
 	struct aat2870_device *drvdata = dev_get_drvdata(dev->parent);
@@ -1135,9 +1135,9 @@ ssize_t aat2870_show_als_option(struct device *dev,
 	return r;
 }
 
-ssize_t aat2870_store_als(struct device *dev, 
-			  struct device_attribute *attr, 
-			  const char *buf, 
+ssize_t aat2870_store_als(struct device *dev,
+			  struct device_attribute *attr,
+			  const char *buf,
 			  size_t count)
 {
 	int value = 0;
@@ -1156,7 +1156,7 @@ ssize_t aat2870_store_als(struct device *dev,
 	if (value==1) {
 		als_mode = ALS_MODE;
 	}
-	else if(value==0) 
+	else if(value==0)
 	{
 		als_mode = NORMAL_MODE;
 	}
@@ -1175,9 +1175,9 @@ ssize_t aat2870_store_als(struct device *dev,
 }
 
 //changhyun.han@lge.com, 20100119 ,added the optimized brightness mode
-ssize_t aat2870_store_als_option(struct device *dev, 
-			  struct device_attribute *attr, 
-			  const char *buf, 
+ssize_t aat2870_store_als_option(struct device *dev,
+			  struct device_attribute *attr,
+			  const char *buf,
 			  size_t count)
 {
 	int value = 0;
@@ -1196,7 +1196,7 @@ ssize_t aat2870_store_als_option(struct device *dev,
 	if (value==0) {
 		als_mode = POWERSAVE_MODE;
 	}
-	else if(value==1) 
+	else if(value==1)
 	{
 		als_mode = OPTIMIZE_MODE;
 	}
@@ -1213,7 +1213,7 @@ ssize_t aat2870_store_als_option(struct device *dev,
 }
 
 
-ssize_t aat2870_show_als_level(struct device *dev, 
+ssize_t aat2870_show_als_level(struct device *dev,
 			       struct device_attribute *attr,
 			       char *buf)
 {
@@ -1229,16 +1229,16 @@ ssize_t aat2870_show_als_level(struct device *dev,
 	queue_work(drvdata->als_wq, &drvdata->als_work);//20100127,changhyun.han@lge.com
     if (drvdata->mode==NORMAL_MODE)
 		drvdata->als_level=0;
-		
+
 	r = snprintf(buf, PAGE_SIZE, "0x%x\n", 	drvdata->als_level);
 	DBG("drvdata->als_level = 0x%x\n", drvdata->als_level);
 
 	return r;
 }
 
-ssize_t aat2870_store_als_control(struct device *dev, 
-			  struct device_attribute *attr, 
-			  const char *buf, 
+ssize_t aat2870_store_als_control(struct device *dev,
+			  struct device_attribute *attr,
+			  const char *buf,
 			  size_t count)
 {
 	struct aat2870_device *drvdata = NULL;
@@ -1260,7 +1260,7 @@ ssize_t aat2870_store_als_control(struct device *dev,
 	return count;
 }
 
-ssize_t aat2870_show_als_control(struct device *dev, 
+ssize_t aat2870_show_als_control(struct device *dev,
 			       struct device_attribute *attr,
 			       char *buf)
 {
@@ -1281,9 +1281,9 @@ ssize_t aat2870_show_als_control(struct device *dev,
 	return r;
 }
 
-ssize_t aat2870_store_alsgain_control(struct device *dev, 
-			  struct device_attribute *attr, 
-			  const char *buf, 
+ssize_t aat2870_store_alsgain_control(struct device *dev,
+			  struct device_attribute *attr,
+			  const char *buf,
 			  size_t count)
 {
 	struct aat2870_device *drvdata = NULL;
@@ -1305,7 +1305,7 @@ ssize_t aat2870_store_alsgain_control(struct device *dev,
 	return count;
 }
 
-ssize_t aat2870_show_alsgain_control(struct device *dev, 
+ssize_t aat2870_show_alsgain_control(struct device *dev,
 			       struct device_attribute *attr,
 			       char *buf)
 {
@@ -1326,9 +1326,9 @@ ssize_t aat2870_show_alsgain_control(struct device *dev,
 	return r;
 }
 
-ssize_t aat2870_store_onoff_control(struct device *dev, 
-			  struct device_attribute *attr, 
-			  const char *buf, 
+ssize_t aat2870_store_onoff_control(struct device *dev,
+			  struct device_attribute *attr,
+			  const char *buf,
 			  size_t count)
 {
 	struct aat2870_device *drvdata = NULL;
@@ -1359,7 +1359,7 @@ ssize_t aat2870_store_onoff_control(struct device *dev,
 	else if (value==2)//shutdown
 	{
 		aat2870_write_reg(drvdata->client, LDO_ABCD_EN_REG, 0x00);
-		gpio_direction_output(LCD_CP_EN, 0);		
+		gpio_direction_output(LCD_CP_EN, 0);
 	}
 	else if (value==3)//on after shutdown
 	{
@@ -1367,7 +1367,7 @@ ssize_t aat2870_store_onoff_control(struct device *dev,
 		aat2870_write_reg(drvdata->client, LDO_AB_LEVEL_REG, 0x4A);
 		aat2870_write_reg(drvdata->client, LDO_CD_LEVEL_REG, 0x4C);
 		aat2870_write_reg(drvdata->client, LDO_ABCD_EN_REG, 0x0F);
-		msleep(5);	
+		msleep(5);
 	}
 	else
 		DBG("is not valid value\n");
@@ -1415,7 +1415,7 @@ static int aat2870_remove(struct i2c_client *i2c_dev)
 		destroy_workqueue(dev->als_wq);
 
 	return 0;
-}	
+}
 
 
 #ifdef CONFIG_HAS_EARLYSUSPEND
@@ -1431,7 +1431,7 @@ static int aat2870_bl_suspend(struct i2c_client *client, pm_message_t state)
 	aat2870_write_reg(client, AAT2870_REG0, 0x00);
 
 	early_bl_timer = 0;
-	//20100205 kyungyoon.kim@lge.com for LCD resume speed[START]	
+	//20100205 kyungyoon.kim@lge.com for LCD resume speed[START]
 	dev->bl_resumed=0;
     //20100205 kyungyoon.kim@lge.com for LCD resume speed[END]
 
@@ -1441,10 +1441,10 @@ static int aat2870_bl_suspend(struct i2c_client *client, pm_message_t state)
 static int aat2870_bl_resume(struct i2c_client *client)
 {
 	struct aat2870_device *dev;
-        
+
 	dev = i2c_get_clientdata(client);
 	DBG("dev->bl_resumed=%d\n",dev->bl_resumed);
-	//20100205 kyungyoon.kim@lge.com for LCD resume speed[START]	
+	//20100205 kyungyoon.kim@lge.com for LCD resume speed[START]
 	if (dev->bl_resumed==1)
 		return 0;
     //20100205 kyungyoon.kim@lge.com for LCD resume speed[END]
@@ -1467,7 +1467,7 @@ void aat2870_resume_for_lcd(void) // 20120213 taeju.park@lge.com To delete compi
 
 #if 0 /* 20110304 seven.kim@lge.com late_resume_lcd */
 	DBG("dev->bl_resumed=%d\n",dev->bl_resumed);
-	//20100205 kyungyoon.kim@lge.com for LCD resume speed[START]	
+	//20100205 kyungyoon.kim@lge.com for LCD resume speed[START]
 	if (dev->bl_resumed==1)
 		return;
     //20100205 kyungyoon.kim@lge.com for LCD resume speed[END]
@@ -1499,7 +1499,7 @@ static void aat2870_early_suspend(struct early_suspend *h)
 	/* 20110218 seven.kim@lge.com to contorl AAT2870 sleep/resume state machine [START] */
 	g_AAT2870_State_Machine = AAT2870_EARLY_SUSPEND_STATE;
 	/* 20110218 seven.kim@lge.com to contorl AAT2870 sleep/resume state machine [END] */
-	
+
 	aat2870_bl_suspend(dev->client, PMSG_SUSPEND);
 	//20100205 kyungyoon.kim@lge.com for LCD resume speed[START]
 	dev->bl_resumed=0;
@@ -1522,7 +1522,7 @@ static void aat2870_late_resume(struct early_suspend *h)
 	g_AAT2870_State_Machine = AAT2870_LATE_RESUME_STATE;
 	/* 20110218 seven.kim@lge.com to contorl AAT2870 sleep/resume state machine [END] */
 
-	 /* 20110304 seven.kim@lge.com late_resume_lcd [START] */	
+	 /* 20110304 seven.kim@lge.com late_resume_lcd [START] */
 	 hrtimer_start(&dev->als_timer, ktime_set(0,500000000), HRTIMER_MODE_REL); //20100304 seven.kim@lge.com late_reaume_lcd changed 100ms -> 500ms
 	 aat2870_bl_resume(dev->client); //20110321 for black lcd display
  	 /* 20110304 seven.kim@lge.com late_resume_lcd [END] */
@@ -1540,7 +1540,7 @@ static int aat2870_suspend(struct i2c_client *client, pm_message_t state)
 {
 	struct aat2870_device *dev;
 	dev = i2c_get_clientdata(client);
-	
+
 	printk("[aat2870_suspend] new state: %d\n",state.event);
 
 	client->dev.power.power_state = state;
@@ -1550,7 +1550,7 @@ static int aat2870_suspend(struct i2c_client *client, pm_message_t state)
 	//20100205 kyungyoon.kim@lge.com for LCD resume speed[START]
 	dev->bl_resumed=0;
 	//20100205 kyungyoon.kim@lge.com for LCD resume speed[END]
-	
+
 #if defined(CONFIG_MACH_LGE_HUB) || defined(CONFIG_MACH_LGE_SNIPER)
 //	DBG("touch disable..\n");
 //	aat2870_touch_ldo_enable(client, 0);
@@ -1606,7 +1606,7 @@ static int aat2870_resume(struct i2c_client *client)
 	mdelay(1);
 	#endif
 	/*20110215 seven.kim@lge.com to adjust touch ldo control [END] */
-   #endif /* 20110304 seven.kim@lge.com late_resume_lcd */	
+   #endif /* 20110304 seven.kim@lge.com late_resume_lcd */
 // prime@sdcmicro.com The following calls are made by hub_lcd_initialize() which is called by panel-hub.c [END]
 #endif
 
@@ -1627,7 +1627,7 @@ static int aat2870_probe(struct i2c_client *i2c_dev, const struct i2c_device_id 
 	pr_warning("%s() -- start\n", __func__);
 
 	aat2870_i2c_client = i2c_dev;
-	
+
 	dev = kzalloc(sizeof(struct aat2870_device), GFP_KERNEL);
 
 	if (dev == NULL) {
@@ -1637,9 +1637,9 @@ static int aat2870_probe(struct i2c_client *i2c_dev, const struct i2c_device_id 
 
 // prime@sdcmicro.com The parameter list of backlight_device_register() was changed in 2.6.35 kernel [START]
 #if 0   // prior to 2.6.35
-	bl_dev = backlight_device_register(AAT2870_I2C_BL_NAME, 
+	bl_dev = backlight_device_register(AAT2870_I2C_BL_NAME,
 					   &i2c_dev->dev,
-					   NULL, 
+					   NULL,
 					   &aat2870_bl_ops);
 	bl_dev->props.max_brightness = MAX_BRIGHTNESS;
 	bl_dev->props.brightness = DEFAULT_BRIGHTNESS;
@@ -1654,9 +1654,9 @@ static int aat2870_probe(struct i2c_client *i2c_dev, const struct i2c_device_id 
                 props.power = FB_BLANK_UNBLANK;
 		   props.type = BACKLIGHT_RAW;  // kibum.lee@lge.comc ICS  WARNING message delete
 
-        	bl_dev = backlight_device_register(AAT2870_I2C_BL_NAME, 
+        	bl_dev = backlight_device_register(AAT2870_I2C_BL_NAME,
         					   &i2c_dev->dev,
-        					   NULL, 
+        					   NULL,
         					   &aat2870_bl_ops,
         					   &props);
         }
@@ -1665,7 +1665,7 @@ static int aat2870_probe(struct i2c_client *i2c_dev, const struct i2c_device_id 
 	bl_dev->props.brightness = USER_LVL_MAX;
 
 	bl_dev->props.power = FB_BLANK_UNBLANK;
-	
+
 	dev->bl_dev = bl_dev;
 	dev->client = i2c_dev;
 	i2c_set_clientdata(i2c_dev, dev);
@@ -1678,7 +1678,7 @@ static int aat2870_probe(struct i2c_client *i2c_dev, const struct i2c_device_id 
 	dev->als_level = 0;
 
 	INIT_WORK(&dev->als_work, als_work_func);
-	
+
 	dev->als_wq = create_singlethread_workqueue("als_wq");
 	if (!dev->als_wq)
 		return -ENOMEM;
@@ -1721,7 +1721,7 @@ static int aat2870_probe(struct i2c_client *i2c_dev, const struct i2c_device_id 
 		err = device_create_file(dev->led->dev, &dev_attr_als_option);//changhyun.han@lge.com, 20100119 ,added the optimized brightness mode
 	}
 
-	//aat2870_set_main_current_level(i2c_dev, DEFAULT_BRIGHTNESS); 
+	//aat2870_set_main_current_level(i2c_dev, DEFAULT_BRIGHTNESS);
 
 	// TODO : error handling
 
@@ -1732,7 +1732,7 @@ static int aat2870_probe(struct i2c_client *i2c_dev, const struct i2c_device_id 
 	register_early_suspend(&dev->early_suspend);
 #endif
 	dev->bl_resumed = 1;
-	
+
 	gpio_request(LCD_CP_EN, "LCD_CP_EN");
 
 	return 0;
@@ -1746,7 +1746,7 @@ static struct i2c_driver aat2870_driver = {
 	.suspend	= aat2870_suspend,
 	.resume		= aat2870_resume,
 //#endif
-	.id_table	= aat2870_bl_id, 
+	.id_table	= aat2870_bl_id,
 
 	.driver = {
 		.name	= AAT2870_I2C_BL_NAME,
