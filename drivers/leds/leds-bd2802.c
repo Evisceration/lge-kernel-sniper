@@ -156,6 +156,10 @@ struct bd2802_led {
 	int     led_resumed;//2011205 kyungyoon.kim@lge.com lcd resume speed
 };
 
+static int led_timer = 1500;
+module_param(led_timer, int, 0600);
+MODULE_PARM_DESC(led_timer, "Miliseconds at max current.");
+
 static struct i2c_client *bd2802_i2c_client;
 /*--------------------------------------------------------------*/
 /*	BD2802GU helper functions					*/
