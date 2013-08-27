@@ -278,21 +278,26 @@ static void __cpuinit smp_store_cpu_info(unsigned int cpuid)
 asmlinkage void __cpuinit secondary_start_kernel(void)
 {
 	struct mm_struct *mm = &init_mm;
-	unsigned int cpu = smp_processor_id();
-	static bool booted;
+	unsigned int cpu;
 
-	printk("CPU%u: Booted secondary processor\n", cpu);
+	/*
+	 * The identity mapping is uncached (strongly ordered), so
+	 * switch away from it before attempting any exclusive accesses.
+	 */
+	cpu_switch_mm(mm->pgd, mm);
+	enter_lazy_tlb(mm, current);
+	local_flush_tlb_all();
 
 	/*
 	 * All kernel threads share the same mm context; grab a
 	 * reference and switch to it.
 	 */
+	cpu = smp_processor_id();
 	atomic_inc(&mm->mm_count);
 	current->active_mm = mm;
 	cpumask_set_cpu(cpu, mm_cpumask(mm));
-	cpu_switch_mm(mm->pgd, mm);
-	enter_lazy_tlb(mm, current);
-	local_flush_tlb_all();
+
+	printk("CPU%u: Booted secondary processor\n", cpu);
 
 	cpu_init();
 	preempt_disable();
@@ -303,11 +308,19 @@ asmlinkage void __cpuinit secondary_start_kernel(void)
 	 */
 	platform_secondary_init(cpu);
 
+	/*
+	 * Enable local interrupts.
+	 */
 	notify_cpu_starting(cpu);
+	local_irq_enable();
+	local_fiq_enable();
 
-	if (!booted)
-		calibrate_delay();
-	booted = true;
+	/*
+	 * Setup the percpu timer for this CPU.
+	 */
+	percpu_timer_setup();
+
+	calibrate_delay();
 
 	smp_store_cpu_info(cpu);
 
@@ -317,21 +330,8 @@ asmlinkage void __cpuinit secondary_start_kernel(void)
 	 * before we continue.
 	 */
 	set_cpu_online(cpu, true);
-
-	/*
-	 * Setup the percpu timer for this CPU.
-	 */
-	percpu_timer_setup();
-
 	while (!cpu_active(cpu))
 		cpu_relax();
-
-	/*
-	 * cpu_active bit is set, so it's safe to enable interrupts
-	 * now.
-	 */
-	local_irq_enable();
-	local_fiq_enable();
 
 	/*
 	 * OK, it's off to the idle thread for us
@@ -412,7 +412,6 @@ static const char *ipi_types[NR_IPI] = {
 	S(IPI_CALL_FUNC, "Function call interrupts"),
 	S(IPI_CALL_FUNC_SINGLE, "Single function call interrupts"),
 	S(IPI_CPU_STOP, "CPU stop interrupts"),
-	S(IPI_CPU_BACKTRACE, "CPU backtrace"),
 };
 
 void show_ipi_list(struct seq_file *p, int prec)
@@ -466,7 +465,9 @@ asmlinkage void __exception_irq_entry do_local_timer(struct pt_regs *regs)
 
 	if (local_timer_ack()) {
 		__inc_irq_stat(cpu, local_timer_irqs);
+		irq_enter();
 		ipi_timer();
+		irq_exit();
 	}
 
 	set_irq_regs(old_regs);
@@ -628,7 +629,9 @@ asmlinkage void __exception_irq_entry do_IPI(int ipinr, struct pt_regs *regs)
 
 	switch (ipinr) {
 	case IPI_TIMER:
+		irq_enter();
 		ipi_timer();
+		irq_exit();
 		break;
 
 	case IPI_RESCHEDULE:
@@ -636,19 +639,27 @@ asmlinkage void __exception_irq_entry do_IPI(int ipinr, struct pt_regs *regs)
 		break;
 
 	case IPI_CALL_FUNC:
+		irq_enter();
 		generic_smp_call_function_interrupt();
+		irq_exit();
 		break;
 
 	case IPI_CALL_FUNC_SINGLE:
+		irq_enter();
 		generic_smp_call_function_single_interrupt();
+		irq_exit();
 		break;
 
 	case IPI_CPU_STOP:
+		irq_enter();
 		ipi_cpu_stop(cpu);
+		irq_exit();
 		break;
 
 	case IPI_CPU_BACKTRACE:
+		irq_enter();
 		ipi_cpu_backtrace(cpu, regs);
+		irq_exit();		
 		break;
 
 	default:
