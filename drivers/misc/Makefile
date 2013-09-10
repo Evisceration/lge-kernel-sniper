@@ -60,12 +60,12 @@ obj-$(CONFIG_GC_CORE)		+= gc-core/
 obj-$(CONFIG_GP2AP_PROXIMITY) += gp2ap_proximity.o
 # LGE_CHANGE_E, hyun.seungjin@lge.com, 2011-02-23, Move directory from driver/hub to misc
 # from GB
-# LGE_CHANGE_S, ryu.seeyeol@lge.com, 2011-01-28, Porting for Sensor Driver 
+# LGE_CHANGE_S, ryu.seeyeol@lge.com, 2011-01-28, Porting for Sensor Driver
 #Description: Enable modem watcher
 # LGE_CHANGE [jugwan.eom@lge.com] 2011-04-25, Modem Watcher
 obj-$(CONFIG_LGE_MODEM_WATCHER)	+= modem_watcher.o
 obj-$(CONFIG_MPU_SENSORS_MPU3050)   += mpu3050/
-# LGE_CHANGE_E, ryu.seeyeol@lge.com, 2011-01-28, Porting for Sensor Driver 
+# LGE_CHANGE_E, ryu.seeyeol@lge.com, 2011-01-28, Porting for Sensor Driver
 # prime@sdcmicro.com Merge from 2.6.32 [START]
 obj-$(CONFIG_TSPDRV)		+= tspdrv/
 # prime@sdcmicro.com Merge from 2.6.32 [END]
@@ -74,3 +74,5 @@ obj-$(CONFIG_LBEE9QMB_RFKILL)	+= lbee9qmb-rfkill.o
 obj-$(CONFIG_BD_ADDRESS)        += bd_address.o
 # Black & Justin sensor drivers is added.
 #obj-$(CONFIG_BJ_SENSORS)	+= bj_sensors/
+# Battery Life eXtender
+obj-$(CONFIG_BLX)		+= blx.o
