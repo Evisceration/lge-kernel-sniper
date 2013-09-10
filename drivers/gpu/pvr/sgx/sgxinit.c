@@ -53,12 +53,6 @@
 #include "srvkm.h"
 #include "ttrace.h"
 
-// LGE_MOD_S 20121119 subum.choi@lge.com PVR_K hidden reset
-#include "linux/reboot.h"
-#include "../../../../arch/arm/mach-omap2/control.h"
-#include <mach/system.h>
-#include <plat/common.h>
-
 #define VAR(x) #x
 
 
@@ -78,12 +72,6 @@
 IMG_BOOL SGX_ISRHandler(IMG_VOID *pvData);
 #endif
 
-// LGE_MOD_S 20121119 subum.choi@lge.com PVR_K hidden reset
-int pvr_k_lock_up_cnt = 0;
-u32 l = 0x00000000;
-extern char reset_mode;
-#define PVR_K_MAX_COUNT 1
-// LGE_MOD_E 20121119 subum.choi@lge.com PVR_K hidden reset
 
 static
 PVRSRV_ERROR SGXGetMiscInfoUkernel(PVRSRV_SGXDEV_INFO	*psDevInfo,
@@ -1327,6 +1315,7 @@ IMG_VOID SGXOSTimer(IMG_VOID *pvData)
 	#endif
 				{
 					PVR_DPF((PVR_DBG_ERROR, "SGXOSTimer() detected SGX lockup (0x%x tasks)", ui32EDMTasks));
+<<<<<<< HEAD
 					// LGE_MOD_S 20121119 subum.choi@lge.com PVR_K hidden reset
 					pvr_k_lock_up_cnt++;
 
@@ -1346,6 +1335,8 @@ IMG_VOID SGXOSTimer(IMG_VOID *pvData)
 						printk("\n[%s] PVR_K lockup :: Count (%d)\n", __func__, pvr_k_lock_up_cnt);
 					}
 					// LGE_MOD_E 20121119 subum.choi@lge.com PVR_K hidden reset
+=======
+>>>>>>> parent of bc76393... bproj: Updates from LGE's v30b P970 drop
 
 					bLockup = IMG_TRUE;
 					(psDevInfo->psSGXHostCtl)->ui32OpenCLDelayCount = 0;
