@@ -73,10 +73,6 @@ obj-$(CONFIG_TSPDRV)		+= tspdrv/
 obj-$(CONFIG_LBEE9QMB_RFKILL)	+= lbee9qmb-rfkill.o
 obj-$(CONFIG_BD_ADDRESS)        += bd_address.o
 # Black & Justin sensor drivers is added.
-<<<<<<< HEAD
 #obj-$(CONFIG_BJ_SENSORS)	+= bj_sensors/
 # Battery Life eXtender
 obj-$(CONFIG_BLX)		+= blx.o
-=======
-obj-$(CONFIG_BJ_SENSORS)	+= bj_sensors/
->>>>>>> parent of bc76393... bproj: Updates from LGE's v30b P970 drop

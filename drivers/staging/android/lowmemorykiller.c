@@ -43,7 +43,7 @@
 #include <linux/compaction.h>
 
 //<!-- BEGIN: hyeongseok.kim@lge.com 2012-08-16 -->
-//<!-- MOD : make LMK see swap condition 
+//<!-- MOD : make LMK see swap condition
 #include <linux/swap.h>
 #include <linux/fs.h>
 #include <linux/slab.h>
@@ -194,25 +194,23 @@ static int lowmem_shrink(struct shrinker *s, struct shrink_control *sc)
 	int other_free = global_page_state(NR_FREE_PAGES);
 	int other_file = global_page_state(NR_FILE_PAGES) -
 						global_page_state(NR_SHMEM);
-<<<<<<< HEAD
-=======
 	int other_file_pages = global_page_state(NR_FILE_PAGES);
 	int other_file_shmem = global_page_state(NR_SHMEM);
 
 //<!-- BEGIN: hyeongseok.kim@lge.com 2012-08-16 -->
-//<!-- MOD : make LMK see swap condition 
+//<!-- MOD : make LMK see swap condition
 	struct sysinfo sysi;
 	si_swapinfo(&sysi);
 
-	/* 
-	 *	- increase min_free_swap progressively, 
-	 *	   in case gap between free-swap and min_free_swap becomes bigger than 
+	/*
+	 *	- increase min_free_swap progressively,
+	 *	   in case gap between free-swap and min_free_swap becomes bigger than
 	 *	   LMK_SWAP_DEC_KBYTES.
 	 *	- must be considered initial value of min_free_swap.
 	 */
-	 
 
-	if( sysi.freeswap < (LMK_SWAP_MINFREE_INIT+LMK_SWAP_DEC_KBYTES)>>2 && 
+
+	if( sysi.freeswap < (LMK_SWAP_MINFREE_INIT+LMK_SWAP_DEC_KBYTES)>>2 &&
 		sysi.freeswap > (min_free_swap+LMK_SWAP_DEC_KBYTES)>>2)
 		min_free_swap += LMK_SWAP_DEC_KBYTES;
 
@@ -225,7 +223,6 @@ static int lowmem_shrink(struct shrinker *s, struct shrink_control *sc)
 	}
 	//lowmem_print(1, "lmk min_free_swap=%dK, free_swap=%dK, RunLMK=%s\n", min_free_swap, sysi.freeswap*4, other_file==0?"TRUE":"FALSE");
 //<!-- END: hyeongseok.kim@lge.com 2012-08-16 -->
->>>>>>> parent of bc76393... bproj: Updates from LGE's v30b P970 drop
 
 	/*
 	 * If we already have a death outstanding, then
@@ -263,20 +260,16 @@ static int lowmem_shrink(struct shrinker *s, struct shrink_control *sc)
 			     sc->nr_to_scan, sc->gfp_mask, rem);
 		return rem;
 	}
-<<<<<<< HEAD
 
 	/* Set the initial oom_score_adj for each managed process type */
 	for (proc_type = KILLABLE_PROCESS; proc_type < MANAGED_PROCESS_TYPES; proc_type++)
 		selected_oom_adj[proc_type] = min_adj;
-=======
-	selected_oom_adj = min_adj;
-	
+
 //<!-- BEGIN: hyeongseok.kim@lge.com 2012-08-16 -->
-//<!-- MOD : make LMK see swap condition 
+//<!-- MOD : make LMK see swap condition
 	if(other_file == 0 && min_free_swap > LMK_SWAP_MIN_KBYTES-1)
 		min_free_swap -= LMK_SWAP_DEC_KBYTES;
 //<!-- END: hyeongseok.kim@lge.com 2012-08-16 -->
->>>>>>> parent of bc76393... bproj: Updates from LGE's v30b P970 drop
 
 	read_lock(&tasklist_lock);
 	for_each_process(p) {
@@ -314,7 +307,6 @@ static int lowmem_shrink(struct shrinker *s, struct shrink_control *sc)
 			proc_type = DO_NOT_KILL_SYSTEM_PROCESS;
 			lowmem_print(2, "The process '%s' is inside the donotkill_sysproc_names", p->comm);
 		}
-<<<<<<< HEAD
 		#endif
 
 		if (selected[proc_type]) {
@@ -357,32 +349,6 @@ static int lowmem_shrink(struct shrinker *s, struct shrink_control *sc)
 	    rem -= selected_tasksize[proc_type];
 	    break;
 	  }
-=======
-		selected = p;
-		selected_tasksize = tasksize;
-		selected_oom_adj = oom_adj;
-		lowmem_print(2, "select %d (%s), adj %d, size %d, to kill\n",
-			     p->pid, p->comm, oom_adj, tasksize);
-	}
-	if (selected) {
-		lowmem_print(1, "send sigkill to %d (%s), adj %d, size %d\n",
-			     selected->pid, selected->comm,
-			     selected_oom_adj, selected_tasksize);
-//<!-- BEGIN: hyeongseok.kim@lge.com 2012-08-16 -->
-//<!-- MOD : make LMK see swap condition 
-		lmk_count++;
-		if(lmk_kill_info)
-			sprintf(lmk_kill_info, "%ul,%s,%d,%d\n",	lmk_count,
-													selected->comm,
-													selected_oom_adj,
-													selected_tasksize);
-//<!-- END: hyeongseok.kim@lge.com 2012-08-16 -->
-
-		lowmem_deathpending = selected;
-		lowmem_deathpending_timeout = jiffies + HZ;
-		force_sig(SIGKILL, selected);
-		rem -= selected_tasksize;
->>>>>>> parent of bc76393... bproj: Updates from LGE's v30b P970 drop
 	}
 	lowmem_print(4, "lowmem_shrink %lu, %x, return %d\n",
 		     sc->nr_to_scan, sc->gfp_mask, rem);
@@ -397,14 +363,11 @@ static struct shrinker lowmem_shrinker = {
 
 static int __init lowmem_init(void)
 {
-<<<<<<< HEAD
-=======
 //<!-- BEGIN: hyeongseok.kim@lge.com 2012-08-16 -->
-//<!-- MOD : make LMK see swap condition 
+//<!-- MOD : make LMK see swap condition
 	lmk_kill_info = kmalloc(1024, GFP_KERNEL);
 //<!-- END: hyeongseok.kim@lge.com 2012-08-16 -->
 
->>>>>>> parent of bc76393... bproj: Updates from LGE's v30b P970 drop
 	task_free_register(&task_nb);
 	register_shrinker(&lowmem_shrinker);
 	return 0;
@@ -414,15 +377,11 @@ static void __exit lowmem_exit(void)
 {
 	unregister_shrinker(&lowmem_shrinker);
 	task_free_unregister(&task_nb);
-<<<<<<< HEAD
-=======
 //<!-- BEGIN: hyeongseok.kim@lge.com 2012-08-16 -->
-//<!-- MOD : make LMK see swap condition 
+//<!-- MOD : make LMK see swap condition
 	if(lmk_kill_info)
 		kfree(lmk_kill_info);
 //<!-- END: hyeongseok.kim@lge.com 2012-08-16 -->
-
->>>>>>> parent of bc76393... bproj: Updates from LGE's v30b P970 drop
 }
 
 module_param_named(cost, lowmem_shrinker.seeks, int, S_IRUGO | S_IWUSR);
@@ -431,7 +390,6 @@ module_param_array_named(adj, lowmem_adj, int, &lowmem_adj_size,
 module_param_array_named(minfree, lowmem_minfree, uint, &lowmem_minfree_size,
 			 S_IRUGO | S_IWUSR);
 module_param_named(debug_level, lowmem_debug_level, uint, S_IRUGO | S_IWUSR);
-<<<<<<< HEAD
 
 #ifdef CONFIG_ANDROID_LOW_MEMORY_KILLER_DO_NOT_KILL_PROCESS
 module_param_named(donotkill_proc, donotkill_proc.enabled, uint, S_IRUGO | S_IWUSR);
@@ -441,13 +399,11 @@ module_param_named(donotkill_sysproc, donotkill_sysproc.enabled, uint, S_IRUGO |
 module_param_array_named(donotkill_sysproc_names, donotkill_sysproc.names, charp,
        &donotkill_sysproc.names_count, S_IRUGO | S_IWUSR);
 #endif
-=======
 //<!-- BEGIN: hyeongseok.kim@lge.com 2012-08-16 -->
-//<!-- MOD : make LMK see swap condition 
+//<!-- MOD : make LMK see swap condition
 module_param_named(lmksts, lmk_kill_info, charp, S_IRUGO | S_IWUSR);
 module_param_named(min_free_swap, min_free_swap, ulong, S_IRUGO | S_IWUSR);
 //<!-- END: hyeongseok.kim@lge.com 2012-08-16 -->
->>>>>>> parent of bc76393... bproj: Updates from LGE's v30b P970 drop
 
 module_init(lowmem_init);
 module_exit(lowmem_exit);

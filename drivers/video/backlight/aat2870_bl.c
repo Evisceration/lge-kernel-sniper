@@ -768,7 +768,6 @@ static void aat2870_set_main_current_level(struct i2c_client *client, int level)
 
 	DBG("fisrt val = 0x%x\n", val);
 
-<<<<<<< HEAD
 	// 20120829 sangki.hyun@lge.com backlight i2c failed {
 	if(check_bl_shutdown)
 	{
@@ -778,8 +777,6 @@ static void aat2870_set_main_current_level(struct i2c_client *client, int level)
 	}
 	// 20120829 sangki.hyun@lge.com backlight i2c failed }
 
-=======
->>>>>>> parent of bc76393... bproj: Updates from LGE's v30b P970 drop
 	aat2870_write_reg(client, AAT2870_REG1, val);
 
 	// TODO : check mdelay
@@ -1532,13 +1529,8 @@ static int aat2870_suspend(struct i2c_client *client, pm_message_t state)
 {
 	struct aat2870_device *dev;
 	dev = i2c_get_clientdata(client);
-<<<<<<< HEAD
 
 	printk("[aat2870_suspend] new state: %d\n",state.event);
-=======
-	
-	DBG("[aat2870_suspend] new state: %d\n",state.event);
->>>>>>> parent of bc76393... bproj: Updates from LGE's v30b P970 drop
 
 	client->dev.power.power_state = state;
 #if	0  // 20120814 sangki.hyun@lge.com ICS Backlight tunning
