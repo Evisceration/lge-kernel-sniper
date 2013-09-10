@@ -220,7 +220,6 @@ static int do_fsync(unsigned int fd, int datasync)
 {
 	struct file *file;
 	int ret = -EBADF;
-	int fput_needed;
 
 	file = fget(fd);
 	if (file) {
