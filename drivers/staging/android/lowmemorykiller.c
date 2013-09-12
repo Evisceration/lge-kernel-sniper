@@ -35,11 +35,11 @@
 #include <linux/oom.h>
 #include <linux/sched.h>
 #include <linux/notifier.h>
-<<<<<<< HEAD
+
 #ifdef CONFIG_ANDROID_LOW_MEMORY_KILLER_DO_NOT_KILL_PROCESS
 #include <linux/string.h>
 #endif
-=======
+
 #include <linux/compaction.h>
 
 //<!-- BEGIN: hyeongseok.kim@lge.com 2012-08-16 -->
@@ -49,7 +49,7 @@
 #include <linux/slab.h>
 //<!--  END: hyeongseok.kim@lge.com 2012-08-16 -->
 
->>>>>>> parent of bc76393... bproj: Updates from LGE's v30b P970 drop
+
 
 static uint32_t lowmem_debug_level = 2;
 static int lowmem_adj[6] = {
@@ -67,8 +67,6 @@ static size_t lowmem_minfree[6] = {
 };
 static int lowmem_minfree_size = 4;
 
-<<<<<<< HEAD
-=======
 //<!-- BEGIN: hyeongseok.kim@lge.com 2012-08-16 -->
 //<!-- MOD : make LMK see swap condition
 #define LMK_SWAP_MINFREE_INIT (96 * 1024)
@@ -79,8 +77,6 @@ unsigned long min_free_swap = LMK_SWAP_MINFREE_INIT;
 char *lmk_kill_info = 0;
 //<!-- END: hyeongseok.kim@lge.com 2012-08-16 -->
 
-
->>>>>>> parent of bc76393... bproj: Updates from LGE's v30b P970 drop
 static struct task_struct *lowmem_deathpending;
 static unsigned long lowmem_deathpending_timeout;
 
