@@ -49,11 +49,6 @@
 #include <linux/slab.h>
 //<!--  END: hyeongseok.kim@lge.com 2012-08-16 -->
 
-<<<<<<< HEAD
-
-
-=======
->>>>>>> 3fa8da5
 static uint32_t lowmem_debug_level = 2;
 static int lowmem_adj[6] = {
 	0,
