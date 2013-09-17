@@ -242,13 +242,13 @@ static ssize_t vdd_opp_show(struct kobject *kobj, struct kobj_attribute *attr,
 	if (attr == &dsp_freq_attr)
 	{
 		static struct clk *clk_handle;
-		unsigned long freq;	
+		unsigned long freq;
 		clk_handle = clk_get(NULL, "dpll2_ck");
 			if (!clk_handle)
 				pr_err("%s: clk_get failed to get dpll2_ck\n", __func__);
-				
+
 			        freq = clk_get_rate(clk_handle);
-		
+
 		return sprintf(buf, "%lu\n", freq/1000);
 	}
 	else
@@ -271,7 +271,7 @@ static ssize_t vdd_opp_store(struct kobject *kobj, struct kobj_attribute *attr,
 		for (i = 0; i < size; i++) {
 			if (omap36xx_opp_def_list_shared[i].freq == 0)
 			       break;
-			
+
 			if (!strcmp("iva", omap36xx_opp_def_list_shared[i].hwmod_name))
 			{
 				if ((omap36xx_opp_def_list_shared[i].freq/1000) == value)
@@ -280,15 +280,10 @@ static ssize_t vdd_opp_store(struct kobject *kobj, struct kobj_attribute *attr,
 					opp_id ++;
 			}
 		  }
-  
-		if (opp_id == 0) {
-			printk(KERN_ERR "%s: Invalid value\n", __func__);
-			return -EINVAL;
-		}
 
 		printk(KERN_DEBUG "rt5604: ---> vdd_opp_store: call omap_pm_dsp_set_min_opp(opp_id=%d)\n", opp_id);
 		omap_pm_dsp_set_min_opp(opp_id);
- 
+
 	} else {
 		return -EINVAL;
 	}
@@ -685,7 +680,7 @@ static int __init omap2_common_pm_init(void)
 		int error = -EINVAL;
 
 		printk(KERN_DEBUG "rt5604: ---> omap2_common_pm_init: sysfs_create_file\n");
-		
+
 		error = sysfs_create_file(power_kobj, &dsp_freq_attr.attr);
 		if (error) {
 			printk(KERN_ERR "%s: sysfs_create_file(dsp_freq) failed %d\n", __func__, error);
