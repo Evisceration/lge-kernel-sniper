@@ -351,7 +351,7 @@ CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 OPTIMIZATION_FLAGS = -O3 -march=armv7-a -mtune=cortex-a8 -mfpu=neon \
                      -ffast-math -fsingle-precision-constant \
                      -fgcse-lm -fgcse-sm -fsched-spec-load -fforce-addr -fno-tree-vectorize \
-                     -pipe -finline-functions -funswitch-loops
+                     -finline-functions -funswitch-loops
 CFLAGS_MODULE   = $(OPTIMIZATION_FLAGS)
 AFLAGS_MODULE   = $(OPTIMIZATION_FLAGS)
 LDFLAGS_MODULE  =
@@ -376,7 +376,8 @@ KBUILD_CFLAGS   := -O3 -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -fno-delete-null-pointer-checks \
 		   -march=armv7-a -mtune=cortex-a8 -mfpu=neon \
 		   -ffast-math -fsingle-precision-constant \
-                   -fgcse-lm -fgcse-sm -fsched-spec-load -fforce-addr -fno-tree-vectorize
+                   -fgcse-lm -fgcse-sm -fsched-spec-load -fforce-addr -fno-tree-vectorize \
+                   -finline-functions -funswitch-loops
 KBUILD_AFLAGS_KERNEL :=
 KBUILD_CFLAGS_KERNEL :=
 KBUILD_AFLAGS   := -D__ASSEMBLY__
