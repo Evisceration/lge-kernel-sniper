@@ -42,12 +42,13 @@
 
 #include <linux/compaction.h>
 
-//<!-- BEGIN: hyeongseok.kim@lge.com 2012-08-16 -->
-//<!-- MOD : make LMK see swap condition
-#include <linux/swap.h>
-#include <linux/fs.h>
-#include <linux/slab.h>
-//<!--  END: hyeongseok.kim@lge.com 2012-08-16 -->
+ //<!-- BEGIN: hyeongseok.kim@lge.com 2012-08-16 -->
+ //<!-- MOD : make LMK see swap condition 
+ //DEL : bs.lim@lge.com
+ /*#include <linux/swap.h>
+ #include <linux/fs.h>
+ #include <linux/slab.h>*/
+ //<!--  END: hyeongseok.kim@lge.com 2012-08-16 -->
 
 static uint32_t lowmem_debug_level = 2;
 static int lowmem_adj[6] = {
@@ -67,12 +68,12 @@ static int lowmem_minfree_size = 4;
 
 //<!-- BEGIN: hyeongseok.kim@lge.com 2012-08-16 -->
 //<!-- MOD : make LMK see swap condition
-#define LMK_SWAP_MINFREE_INIT (96 * 1024)
+/*#define LMK_SWAP_MINFREE_INIT (96 * 1024)
 #define LMK_SWAP_MIN_KBYTES	(16*1024)
 #define LMK_SWAP_DEC_KBYTES (8*1024)
 unsigned long lmk_count = 0UL;
 unsigned long min_free_swap = LMK_SWAP_MINFREE_INIT;
-char *lmk_kill_info = 0;
+char *lmk_kill_info = 0;*/
 //<!-- END: hyeongseok.kim@lge.com 2012-08-16 -->
 
 static struct task_struct *lowmem_deathpending;
@@ -193,8 +194,8 @@ static int lowmem_shrink(struct shrinker *s, struct shrink_control *sc)
 
 //<!-- BEGIN: hyeongseok.kim@lge.com 2012-08-16 -->
 //<!-- MOD : make LMK see swap condition
-	struct sysinfo sysi;
-	si_swapinfo(&sysi);
+	/*struct sysinfo sysi;
+	si_swapinfo(&sysi);*/
 
 	/*
 	 *	- increase min_free_swap progressively,
@@ -204,7 +205,7 @@ static int lowmem_shrink(struct shrinker *s, struct shrink_control *sc)
 	 */
 
 
-	if( sysi.freeswap < (LMK_SWAP_MINFREE_INIT+LMK_SWAP_DEC_KBYTES)>>2 &&
+	/*if( sysi.freeswap < (LMK_SWAP_MINFREE_INIT+LMK_SWAP_DEC_KBYTES)>>2 &&
 		sysi.freeswap > (min_free_swap+LMK_SWAP_DEC_KBYTES)>>2)
 		min_free_swap += LMK_SWAP_DEC_KBYTES;
 
@@ -214,7 +215,7 @@ static int lowmem_shrink(struct shrinker *s, struct shrink_control *sc)
 		other_file -= total_swapcache_pages;
 		if(other_file < 0)
 			other_file = 0;
-	}
+	}*/
 	//lowmem_print(1, "lmk min_free_swap=%dK, free_swap=%dK, RunLMK=%s\n", min_free_swap, sysi.freeswap*4, other_file==0?"TRUE":"FALSE");
 //<!-- END: hyeongseok.kim@lge.com 2012-08-16 -->
 
@@ -261,8 +262,8 @@ static int lowmem_shrink(struct shrinker *s, struct shrink_control *sc)
 
 //<!-- BEGIN: hyeongseok.kim@lge.com 2012-08-16 -->
 //<!-- MOD : make LMK see swap condition
-	if(other_file == 0 && min_free_swap > LMK_SWAP_MIN_KBYTES-1)
-		min_free_swap -= LMK_SWAP_DEC_KBYTES;
+	/*if(other_file == 0 && min_free_swap > LMK_SWAP_MIN_KBYTES-1)
+		min_free_swap -= LMK_SWAP_DEC_KBYTES;*/
 //<!-- END: hyeongseok.kim@lge.com 2012-08-16 -->
 
 	read_lock(&tasklist_lock);
@@ -313,6 +314,19 @@ static int lowmem_shrink(struct shrinker *s, struct shrink_control *sc)
 		selected[proc_type] = p;
 		selected_tasksize[proc_type] = tasksize;
 		selected_oom_adj[proc_type] = oom_adj;
+	//kiyong.choi@lge.com (+)
+		if(lowmem_deathpending && selected[proc_type] != lowmem_deathpending)
+		{
+		   if(selected_oom_adj[proc_type] > 5){
+				force_sig(SIGKILL, selected[proc_type]);
+				lowmem_print(1, "time out send sigkill to %d (%s), adj %d, size %d ****\n",
+					 selected[proc_type]->pid, selected[proc_type]->comm,
+					 selected_oom_adj[proc_type], selected_tasksize[proc_type]);
+				selected[proc_type]=NULL;
+				continue;
+		   }
+		}
+    	//kiyong.choi@lge.com (-)
 		lowmem_print(2, "select %d (%s), adj %d, size %d, to kill\n",
 			     p->pid, p->comm, oom_adj, tasksize);
 	}
@@ -359,7 +373,7 @@ static int __init lowmem_init(void)
 {
 //<!-- BEGIN: hyeongseok.kim@lge.com 2012-08-16 -->
 //<!-- MOD : make LMK see swap condition
-	lmk_kill_info = kmalloc(1024, GFP_KERNEL);
+	/*lmk_kill_info = kmalloc(1024, GFP_KERNEL);*/
 //<!-- END: hyeongseok.kim@lge.com 2012-08-16 -->
 
 	task_free_register(&task_nb);
@@ -373,8 +387,8 @@ static void __exit lowmem_exit(void)
 	task_free_unregister(&task_nb);
 //<!-- BEGIN: hyeongseok.kim@lge.com 2012-08-16 -->
 //<!-- MOD : make LMK see swap condition
-	if(lmk_kill_info)
-		kfree(lmk_kill_info);
+	/*if(lmk_kill_info)
+		kfree(lmk_kill_info);*/
 //<!-- END: hyeongseok.kim@lge.com 2012-08-16 -->
 }
 
@@ -395,8 +409,8 @@ module_param_array_named(donotkill_sysproc_names, donotkill_sysproc.names, charp
 #endif
 //<!-- BEGIN: hyeongseok.kim@lge.com 2012-08-16 -->
 //<!-- MOD : make LMK see swap condition
-module_param_named(lmksts, lmk_kill_info, charp, S_IRUGO | S_IWUSR);
-module_param_named(min_free_swap, min_free_swap, ulong, S_IRUGO | S_IWUSR);
+/*module_param_named(lmksts, lmk_kill_info, charp, S_IRUGO | S_IWUSR);
+module_param_named(min_free_swap, min_free_swap, ulong, S_IRUGO | S_IWUSR);*/
 //<!-- END: hyeongseok.kim@lge.com 2012-08-16 -->
 
 module_init(lowmem_init);
