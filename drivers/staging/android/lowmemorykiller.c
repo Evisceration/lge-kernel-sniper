@@ -181,6 +181,8 @@ static int lowmem_shrink(struct shrinker *s, struct shrink_control *sc)
 	int tasksize;
 	int i;
 	int min_adj = OOM_ADJUST_MAX + 1;
+	int target_free = 0;
+	int selected_target_offset;
 	int minfree = 0;
 	enum lowmem_process_type proc_type = KILLABLE_PROCESS;
 	int selected_tasksize[MANAGED_PROCESS_TYPES] = {0};
@@ -271,6 +273,7 @@ static int lowmem_shrink(struct shrinker *s, struct shrink_control *sc)
 		struct mm_struct *mm;
 		struct signal_struct *sig;
 		int oom_adj;
+		int target_offset;
 
 		task_lock(p);
 		mm = p->mm;
@@ -288,6 +291,7 @@ static int lowmem_shrink(struct shrinker *s, struct shrink_control *sc)
 		task_unlock(p);
 		if (tasksize <= 0)
 			continue;
+		target_offset = abs(target_free - tasksize);
 		/* Initially consider the process as killable */
 		proc_type = KILLABLE_PROCESS;
 
@@ -308,11 +312,12 @@ static int lowmem_shrink(struct shrinker *s, struct shrink_control *sc)
 			if (oom_adj < selected_oom_adj[proc_type])
 				continue;
 			if (oom_adj == selected_oom_adj[proc_type] &&
-				tasksize <= selected_tasksize[proc_type])
+				target_offset >= selected_target_offset)
 				continue;
 		}
 		selected[proc_type] = p;
 		selected_tasksize[proc_type] = tasksize;
+		selected_target_offset = target_offset;
 		selected_oom_adj[proc_type] = oom_adj;
 	//kiyong.choi@lge.com (+)
 		if(lowmem_deathpending && selected[proc_type] != lowmem_deathpending)
