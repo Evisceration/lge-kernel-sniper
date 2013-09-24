@@ -19,6 +19,7 @@
 #include <linux/sysfs.h>
 #include <linux/earlysuspend.h>
 #include <linux/mutex.h>
+#include <linux/fs.h>
 
 #include <linux/writeback.h>
 
