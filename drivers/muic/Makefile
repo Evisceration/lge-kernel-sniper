@@ -6,6 +6,6 @@ obj-$(CONFIG_USIF)		+= usif.o
 
 obj-$(CONFIG_MUIC_TS5USBA33402) += lu6800_muic.o
 obj-$(CONFIG_MUIC_TSU5611) += muic_tsu5611.o
-obj-$(CONFIG_MUIC_MAX14526DEEWP)          += ku5900_muic.o
+obj-$(CONFIG_MUIC_MAX14526DEEWP)          += p970_muic.o
 
 
