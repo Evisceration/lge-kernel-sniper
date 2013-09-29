@@ -33,11 +33,11 @@ struct omap_opp_def omap36xx_opp_def_list_shared[15];  /*shared*/
 
 /* VDD1 */
 
-#define OMAP3430_VDD_MPU_OPP1_UV		1012500
-#define OMAP3430_VDD_MPU_OPP2_UV		1200000
-#define OMAP3430_VDD_MPU_OPP3_UV		1325000
-#define OMAP3430_VDD_MPU_OPP4_UV		1375000
-#define OMAP3430_VDD_MPU_OPP5_UV		1450000
+#define OMAP3430_VDD_MPU_OPP1_UV		975000
+#define OMAP3430_VDD_MPU_OPP2_UV		1075000
+#define OMAP3430_VDD_MPU_OPP3_UV		1200000
+#define OMAP3430_VDD_MPU_OPP4_UV		1270000
+#define OMAP3430_VDD_MPU_OPP5_UV		1350000
 
 struct omap_volt_data omap34xx_vddmpu_volt_data[] = {
 	VOLT_DATA_DEFINE(OMAP3430_VDD_MPU_OPP1_UV, 0, OMAP343X_CONTROL_FUSE_OPP1_VDD1, 0xf4, 0x0c, OMAP_ABB_NONE),
@@ -50,9 +50,9 @@ struct omap_volt_data omap34xx_vddmpu_volt_data[] = {
 
 /* VDD2 */
 
-#define OMAP3430_VDD_CORE_OPP1_UV		1012500
-#define OMAP3430_VDD_CORE_OPP2_UV		1200000
-#define OMAP3430_VDD_CORE_OPP3_UV		1325000
+#define OMAP3430_VDD_CORE_OPP1_UV		975000
+#define OMAP3430_VDD_CORE_OPP2_UV		1050000
+#define OMAP3430_VDD_CORE_OPP3_UV		1150000
 
 struct omap_volt_data omap34xx_vddcore_volt_data[] = {
 	VOLT_DATA_DEFINE(OMAP3430_VDD_CORE_OPP1_UV, 0, OMAP343X_CONTROL_FUSE_OPP1_VDD2, 0xf4, 0x0c, OMAP_ABB_NONE),
@@ -88,7 +88,6 @@ struct omap_vdd_dep_info omap34xx_vddmpu_dep_info[] = {
 #define OMAP3630_VDD_MPU_OPP100_UV		1200000
 #define OMAP3630_VDD_MPU_OPP120_UV		1325000
 #define OMAP3630_VDD_MPU_OPP1G_UV		1375000
-#define OMAP3630_VDD_MPU_OPP2G_UV		1450000
 #endif
 
 struct omap_volt_data omap36xx_vddmpu_volt_data[] = {
@@ -100,7 +99,6 @@ struct omap_volt_data omap36xx_vddmpu_volt_data[] = {
 	VOLT_DATA_DEFINE(OMAP3630_VDD_MPU_OPP100_UV, 100000, OMAP3630_CONTROL_FUSE_OPP100_VDD1, 0xf9, 0x16, OMAP_ABB_NOMINAL_OPP),
 	VOLT_DATA_DEFINE(OMAP3630_VDD_MPU_OPP120_UV, 100000, OMAP3630_CONTROL_FUSE_OPP120_VDD1, 0xfa, 0x23, OMAP_ABB_NOMINAL_OPP),
 	VOLT_DATA_DEFINE(OMAP3630_VDD_MPU_OPP1G_UV, 100000, OMAP3630_CONTROL_FUSE_OPP1G_VDD1, 0xfa, 0x27, OMAP_ABB_FAST_OPP),
-	VOLT_DATA_DEFINE(OMAP3630_VDD_MPU_OPP2G_UV, 100000, OMAP3630_CONTROL_FUSE_OPP2G_VDD1, 0xfa, 0x27, OMAP_ABB_FAST_OPP),
 	// LGE_MOD_E 20121117 subum.choi@lge.com		// MPU H/W Reset patch from deepak
 	VOLT_DATA_DEFINE(0, 0, 0, 0, 0, 0),
 };
@@ -160,7 +158,7 @@ static struct omap_opp_def __initdata omap34xx_opp_def_list[] = {
 
 static struct omap_opp_def __initdata omap36xx_opp_def_list[] = {
 	/* MPU OPP1 - OPP50 */
-	OPP_INITIALIZER("mpu", "dpll1_ck", "mpu_iva", true,  200000000, OMAP3630_VDD_MPU_OPP50_UV),
+	OPP_INITIALIZER("mpu", "dpll1_ck", "mpu_iva", true,  300000000, OMAP3630_VDD_MPU_OPP50_UV),
 	/* MPU OPP2 - OPP100 */
 	OPP_INITIALIZER("mpu", "dpll1_ck", "mpu_iva", true,  600000000, OMAP3630_VDD_MPU_OPP100_UV),
 	/* MPU OPP3 - OPP-Turbo */
@@ -169,8 +167,6 @@ static struct omap_opp_def __initdata omap36xx_opp_def_list[] = {
 	/* MPU OPP4 - OPP-SB */
 	OPP_INITIALIZER("mpu", "dpll1_ck", "mpu_iva", true,
 				1000000000, OMAP3630_VDD_MPU_OPP1G_UV),
-	OPP_INITIALIZER("mpu", "dpll1_ck", "mpu_iva", true,
-				1200000000, OMAP3630_VDD_MPU_OPP2G_UV),
 
 /* S[, 2012.07.02, mannsik.chung@lge.com, Boost L3 clock. (TI patch by deepak.muddegowda@sasken.com) */
 #if 0
@@ -208,7 +204,6 @@ static struct omap_vdd_dep_volt omap36xx_vdd_mpu_core_dep_data[] = {
 	{.main_vdd_volt = OMAP3630_VDD_MPU_OPP100_UV, .dep_vdd_volt = OMAP3630_VDD_CORE_OPP100_UV},
 	{.main_vdd_volt = OMAP3630_VDD_MPU_OPP120_UV, .dep_vdd_volt = OMAP3630_VDD_CORE_OPP100_UV},
 	{.main_vdd_volt = OMAP3630_VDD_MPU_OPP1G_UV, .dep_vdd_volt = OMAP3630_VDD_CORE_OPP100_UV},
-	{.main_vdd_volt = OMAP3630_VDD_MPU_OPP2G_UV, .dep_vdd_volt = OMAP3630_VDD_CORE_OPP100_UV},
 };
 
 struct omap_vdd_dep_info omap36xx_vddmpu_dep_info[] = {
