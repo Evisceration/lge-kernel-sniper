@@ -598,10 +598,10 @@ EXPORT_SYMBOL(memset);
 void *memcpy(void *dest, const void *src, size_t count)
 {
        unsigned long dstp = (unsigned long)dest;
-        unsigned long srcp = (unsigned long)src;
+       unsigned long srcp = (unsigned long)src;
 
-        /* Copy from the beginning to the end */
-          mem_copy_fwd(dstp, srcp, count);
+       /* Copy from the beginning to the end */
+       mem_copy_fwd(dstp, srcp, count);
 
 	return dest;
 }
@@ -626,8 +626,8 @@ void *memmove(void *dest, const void *src, size_t count)
              /* Copy from the beginning to the end */
              mem_copy_fwd(dstp, srcp, count);
 	} else {
-                            /* Copy from the end to the beginning */
-                         mem_copy_bwd(dstp, srcp, count);
+             /* Copy from the end to the beginning */
+             mem_copy_bwd(dstp, srcp, count);
 	}
 	return dest;
 }
