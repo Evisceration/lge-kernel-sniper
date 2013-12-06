@@ -36,7 +36,7 @@ obj-$(CONFIG_DS1682)		+= ds1682.o
 obj-$(CONFIG_TI_DAC7512)	+= ti_dac7512.o
 obj-$(CONFIG_UID_STAT)		+= uid_stat.o
 obj-$(CONFIG_C2PORT)		+= c2port/
-obj-$(CONFIG_IWMC3200TOP)      += iwmc3200top/
+obj-$(CONFIG_IWMC3200TOP)	+= iwmc3200top/
 obj-$(CONFIG_HMC6352)		+= hmc6352.o
 obj-y				+= eeprom/
 obj-y				+= cb710/
@@ -60,12 +60,12 @@ obj-$(CONFIG_GC_CORE)		+= gc-core/
 obj-$(CONFIG_GP2AP_PROXIMITY) += gp2ap_proximity.o
 # LGE_CHANGE_E, hyun.seungjin@lge.com, 2011-02-23, Move directory from driver/hub to misc
 # from GB
-# LGE_CHANGE_S, ryu.seeyeol@lge.com, 2011-01-28, Porting for Sensor Driver 
+# LGE_CHANGE_S, ryu.seeyeol@lge.com, 2011-01-28, Porting for Sensor Driver
 #Description: Enable modem watcher
 # LGE_CHANGE [jugwan.eom@lge.com] 2011-04-25, Modem Watcher
 obj-$(CONFIG_LGE_MODEM_WATCHER)	+= modem_watcher.o
 obj-$(CONFIG_MPU_SENSORS_MPU3050)   += mpu3050/
-# LGE_CHANGE_E, ryu.seeyeol@lge.com, 2011-01-28, Porting for Sensor Driver 
+# LGE_CHANGE_E, ryu.seeyeol@lge.com, 2011-01-28, Porting for Sensor Driver
 # prime@sdcmicro.com Merge from 2.6.32 [START]
 obj-$(CONFIG_TSPDRV)		+= tspdrv/
 # prime@sdcmicro.com Merge from 2.6.32 [END]

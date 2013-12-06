@@ -755,15 +755,24 @@ static void aat2870_set_main_current_level(struct i2c_client *client, int level)
 
 	// LGE_B_DOM_S 2011218 kyungrae.jo@lge.com, use max current
 	//max 25.2mA, min 1.8mA
-	if(level > 30)
-		val = (unsigned char)(level * 28 / 255);
+	if(level > 85)
+	  val = (unsigned char)((level * 33 / 255)-6);
 	else
-		val = (unsigned char)(level * 2 / 30);
+	  val = (unsigned char)(level * 15 / 255);
 	// LGE_B_DOM_E 2011218 kyungrae.jo@lge.com, use max current
 
 	val = 0xE0 | val;
 
 	DBG("fisrt val = 0x%x\n", val);
+
+	// 20120829 sangki.hyun@lge.com backlight i2c failed {
+	if(check_bl_shutdown)
+	{
+		gpio_set_value(LCD_CP_EN, 1);
+		check_bl_shutdown = 0;
+		udelay(80);
+	}
+	// 20120829 sangki.hyun@lge.com backlight i2c failed }
 
 	aat2870_write_reg(client, AAT2870_REG1, val);
 
@@ -1530,7 +1539,7 @@ static int aat2870_suspend(struct i2c_client *client, pm_message_t state)
 	struct aat2870_device *dev;
 	dev = i2c_get_clientdata(client);
 
-	DBG("[aat2870_suspend] new state: %d\n",state.event);
+	printk("[aat2870_suspend] new state: %d\n",state.event);
 
 	client->dev.power.power_state = state;
 #if	0  // 20120814 sangki.hyun@lge.com ICS Backlight tunning
@@ -1762,4 +1771,5 @@ module_exit(aat2870_exit);
 MODULE_DESCRIPTION("AAT2870 Backlight Control");
 MODULE_AUTHOR("Yool-Je Cho <yoolje.cho@lge.com>");
 MODULE_LICENSE("GPL");
+
 

@@ -24,14 +24,14 @@ enum { ASYNC, SYNC };
 
 /* Tunables */
 static const int sync_read_expire  = HZ / 2;	/* max time before a sync read is submitted. */
-static const int sync_write_expire = 2 * HZ;	/* max time before a sync write is submitted. */
+static const int sync_write_expire = 4 * HZ;	/* max time before a sync write is submitted. */
 
 static const int async_read_expire  =  4 * HZ;	/* ditto for async, these limits are SOFT! */
 static const int async_write_expire = 16 * HZ;	/* ditto for async, these limits are SOFT! */
 
 static const int writes_starved = 2;		/* max times reads can starve a write */
-static const int fifo_batch     = 1;		/* # of sequential requests treated as one
-						   by the above parameters. For throughput. */
+static const int fifo_batch     = 8;		/* # of sequential requests treated as one
+												by the above parameters. For throughput. */
 
 /* Elevator data */
 struct sio_data {
@@ -89,7 +89,7 @@ sio_queue_empty(struct request_queue *q)
 	struct sio_data *sd = q->elevator->elevator_data;
 
 	/* Check if fifo lists are empty */
-	return list_empty(&sd->fifo_list[SYNC][READ]) && list_empty(&sd->fifo_list[SYNC][WRITE])
+	return list_empty(&sd->fifo_list[SYNC][READ]) && list_empty(&sd->fifo_list[SYNC][WRITE]) &&
 	       list_empty(&sd->fifo_list[ASYNC][READ]) && list_empty(&sd->fifo_list[ASYNC][WRITE]);
 }
 #endif

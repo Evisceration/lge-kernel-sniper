@@ -23,6 +23,7 @@
 #include <linux/string.h>
 #include <linux/ctype.h>
 #include <linux/module.h>
+#include <linux/memcopy.h>
 
 #ifndef __HAVE_ARCH_STRNICMP
 /**
@@ -628,7 +629,7 @@ void *memmove(void *dest, const void *src, size_t count)
         /* Copy from the end to the beginning */
         mem_copy_bwd(dstp, srcp, count);
     }
-    
+
     return dest;
 }
 EXPORT_SYMBOL(memmove);

@@ -1,10 +1,25 @@
-ccflags-y = -DLINUX -D__linux__ -DANDROID -DPVR_BUILD_DIR="\"omap4430_android\""
+ccflags-y := \
+-Wno-pointer-sign\
+-fno-strict-overflow\
+-fconserve-stack\
+-Wdeclaration-after-statement\
+-Wpointer-arith\
+-Wmissing-format-attribute\
+-Wno-format-zero-length\
+-Wmissing-prototypes\
+-Wstrict-prototypes\
+-Wno-unused-parameter\
+-Wno-sign-compare\
+-fno-strict-aliasing\
+-Wno-pointer-arith\
+-O2 -fmodulo-sched -fmodulo-sched-allow-regmoves
+
+ccflags-y += -DLINUX -D__linux__ -DANDROID -DPVR_BUILD_DIR="\"omap4430_android\""
 ccflags-$(CONFIG_PVR_SGXCORE_540) += -Idrivers/gpu/pvr -Idrivers/gpu/pvr/omap4 -Idrivers/video/omap2
 ccflags-$(CONFIG_PVR_SGXCORE_530) += -Idrivers/gpu/pvr -Idrivers/gpu/pvr/omap3 -Idrivers/video/omap2
 ccflags-y += \
 	-DSUPPORT_SGX \
 	-DTRANSFER_QUEUE \
-	-DSGX_DYNAMIC_TIMING_INFO \
 	-DSUPPORT_HW_RECOVERY \
 	-DLDM_PLATFORM \
 	-DSUPPORT_SGX_NEW_STATUS_VALS \

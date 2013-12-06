@@ -1,4 +1,4 @@
-/* these are the voltages of the OMAP3 
+/* these are the voltages of the OMAP3
  * for MPU and CORE voltages
  */
 

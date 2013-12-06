@@ -154,9 +154,6 @@ static bool allow_usb = 1;
 module_param(allow_usb, bool, 1);
 MODULE_PARM_DESC(allow_usb, "Allow USB charge drawing default current");
 
-/* Ptr to thermistor table */
-int *therm_tbl;
-
 struct twl4030_bci {
 	struct device		*dev;
 
@@ -1037,8 +1034,6 @@ static int __init twl4030_bci_probe(struct platform_device *pdev)
 	struct twl4030_bci *bci;
 	int ret;
 	int reg;
-
-	therm_tbl = pdata->battery_tmp_tbl;
 
 	bci = kzalloc(sizeof(*bci), GFP_KERNEL);
 	if (bci == NULL)

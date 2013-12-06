@@ -113,7 +113,7 @@ extern void __init subpm_lp8720_init(void);
 //--[[ LGE_UBIQUIX_MODIFIED_START : ymjun@mnbt.co.kr [2012.03.27] - CAM from GB
 #include <media/v4l2-int-device.h>
 
-#if (defined(CONFIG_VIDEO_IMX072) || defined(CONFIG_VIDEO_IMX072_MODULE)) 
+#if (defined(CONFIG_VIDEO_IMX072) || defined(CONFIG_VIDEO_IMX072_MODULE))
 #include <media/imx072.h>
 #include <../drivers/media/video/rt8515.h>
 #include <../drivers/media/video/dw9716.h>
@@ -122,7 +122,7 @@ extern struct dw9716_platform_data hub_dw9716_platform_data;
 extern struct rt8515_platform_data hub_rt8515_data;
 #endif
 
-#if (defined(CONFIG_VIDEO_YACD5B1S) || defined(CONFIG_VIDEO_YACD5B1S_MODULE)) 
+#if (defined(CONFIG_VIDEO_YACD5B1S) || defined(CONFIG_VIDEO_YACD5B1S_MODULE))
 #include <../drivers/media/video/yacd5b1s.h>
 extern struct yacd5b1s_platform_data hub_yacd5b1s_platform_data;
 #endif
@@ -147,7 +147,7 @@ struct dp3t_switch_platform_data dp3t_pdata = {
 static struct platform_device dp3t_dev = {
 	.name = "switch-dp3t",
 	.id	  = -1,
-	.dev	= {	
+	.dev	= {
 		.platform_data = &dp3t_pdata,
 	},
 };
@@ -161,7 +161,7 @@ struct usif_switch_platform_data usif_pdata = {
 static struct platform_device usif_dev = {
 	.name = "switch-usif",
 	.id	  = -1,
-	.dev	= {	
+	.dev	= {
 		.platform_data = &usif_pdata,
 	},
 };
@@ -228,10 +228,10 @@ static struct matrix_keymap_data board_map_data = {
 
 static struct twl4030_keypad_data hub_kp_twl4030_data = {
 	.keymap_data	= &board_map_data,
-// 20100619 jh.koo@lge.com Hub key [START_LGE]		
+// 20100619 jh.koo@lge.com Hub key [START_LGE]
 	.rows		= 3,
 	.cols		= 3,
-// 20100619 jh.koo@lge.com Hub key [END_LGE]	
+// 20100619 jh.koo@lge.com Hub key [END_LGE]
 };
 
 static int hub_reset_keys_up[] = {
@@ -481,8 +481,8 @@ static struct regulator_init_data hub_vmmc2 = {
 /* VSIM for 1.8V_WLAN */
 static struct regulator_init_data hub_vsim = {
 	.constraints = {
-		.min_uV			= 1800000,
-		.max_uV			= 3000000,
+		.min_uV			= 1400000,
+		.max_uV			= 2600000,
 		.valid_modes_mask	= REGULATOR_MODE_NORMAL
 					| REGULATOR_MODE_STANDBY,
 		.valid_ops_mask		= REGULATOR_CHANGE_VOLTAGE
@@ -754,7 +754,7 @@ static struct synaptics_i2c_rmi_platform_data hub_ts_synaptics_platform_data[] =
 static struct muic_platform_data muic_pdata = {
 	.gpio_int = MUIC_INT_GPIO,
 	.gpio_ifx_vbus = GPIO_IFX_USB_VBUS_EN,
-	//.gpio_mhl = NULL,	
+	//.gpio_mhl = NULL,
 };
 #endif
 
@@ -793,7 +793,7 @@ static struct i2c_board_info __initdata hub_i2c_bus2_info[] = {
     {
     	I2C_BOARD_INFO("hub_i2c_muic", 0x88>>1),
 	.irq = OMAP_GPIO_IRQ(MUIC_INT_GPIO),
-	.platform_data = &muic_pdata,			
+	.platform_data = &muic_pdata,
     },
 #endif
 
@@ -802,13 +802,13 @@ static struct i2c_board_info __initdata hub_i2c_bus2_info[] = {
 #if defined (CONFIG_LEDS_BD2802_LGE) || defined(CONFIG_LEDS_BD2802_KU5900)
 //--]] LGE_UBIQUIX_MODIFIED_END : shyun@ubiquix.com [2012.03.21]- When added to the board-ku5900-peripherals.c will be rollback.(TBD)
     {
-    	I2C_BOARD_INFO("BD2802", KEY_LEDS_BD2802_ADDRESS),    
+    	I2C_BOARD_INFO("BD2802", KEY_LEDS_BD2802_ADDRESS),
     },
 #endif
 /*20101115 LGE_CHANGE kyungyoon.kim@lge.com Key LED Controller*/
 #if defined (CONFIG_FUELGAUGE_MAX17043)
     {
-    	I2C_BOARD_INFO("max17043", 0x36),    
+    	I2C_BOARD_INFO("max17043", 0x36),
     },
 #endif
 };
@@ -826,7 +826,7 @@ static struct i2c_board_info __initdata hub_i2c_bus2_info[] = {
 static struct mpu3050_platform_data mpu3050_data = {
     .int_config  = 0x10,
     .orientation = { 0,  -1,  0,
-                     -1,  0,  0, 
+                     -1,  0,  0,
                       0,  0,  -1 },
     .level_shifter = 0,
     .accel = {
@@ -835,12 +835,12 @@ static struct mpu3050_platform_data mpu3050_data = {
 #else
          .get_slave_descr = get_accel_slave_descr,
 #endif
-		.adapt_num   = 3,  // The i2c bus to which the mpu device is 
+		.adapt_num   = 3,  // The i2c bus to which the mpu device is
                            // connected
         .bus         = EXT_SLAVE_BUS_SECONDARY,
         .address     = 0x0F,
-        .orientation = {  0, 1 ,  0, 
-                          1, 0,  0, 
+        .orientation = {  0, 1 ,  0,
+                          1, 0,  0,
                           0,  0,  -1 },
 /* LGE_CHANGE_S, hyun.seungjin@lge.com, 2011-03-04, Use Accel IRQ */
 /* LGE_CHANGE_S, ryu.seeyeol@lge.com, 2011-04-21, Don't Use Accel IRQ */
@@ -854,12 +854,12 @@ static struct mpu3050_platform_data mpu3050_data = {
 #else
 	    .get_slave_descr = get_compass_slave_descr,
 #endif
-	    .adapt_num   = 3,	// The i2c bus to which the mpu device is 
+	    .adapt_num   = 3,	// The i2c bus to which the mpu device is
 	    			// connected
 	    .bus         = EXT_SLAVE_BUS_PRIMARY,
 	    .address     = 0x0D,
-        .orientation = {  0,  1,  0, 
-		    1,  0,  0, 
+        .orientation = {  0,  1,  0,
+		    1,  0,  0,
 		    0,  0,  -1},
     },
 };
@@ -900,7 +900,7 @@ static struct i2c_board_info __initdata hub_i2c_bus3_info[] = {
 
 /* Proximity Sensor */
 #if defined(CONFIG_BJ_PROXI_SENSOR)
-	{	 
+	{
 		I2C_BOARD_INFO("black_proxi", 0x44),
 	},
 #elif defined(CONFIG_GP2AP_PROXIMITY)
@@ -920,29 +920,29 @@ static struct i2c_board_info __initdata hub_i2c_bus3_info[] = {
 #if defined(CONFIG_BJ_COMPASS_SENSOR)
 	{
 		I2C_BOARD_INFO("black_akm8973",0x0D),
-	},	
+	},
 #endif
 
 /* Gyro Sensor */
 #if defined(CONFIG_BJ_MPU3050_SENSOR)
 	{
 		I2C_BOARD_INFO("heaven_gyro", 0x68),
-	},	
+	},
 #endif
 
 //--[[ LGE_UBIQUIX_MODIFIED_START : ymjun@mnbt.co.kr [2012.03.27] - CAM from GB
-#if (defined(CONFIG_VIDEO_IMX072) || defined(CONFIG_VIDEO_IMX072_MODULE)) 
+#if (defined(CONFIG_VIDEO_IMX072) || defined(CONFIG_VIDEO_IMX072_MODULE))
 	{
 		I2C_BOARD_INFO("imx072", IMX072_I2C_ADDR),
 		.platform_data = &hub_imx072_platform_data,
 	},
-		
+
 	{
 		I2C_BOARD_INFO(DW9716_NAME,  DW9716_AF_I2C_ADDR),
 		.platform_data = &hub_dw9716_platform_data,
 	},
 #endif
-#if (defined(CONFIG_VIDEO_YACD5B1S) || defined(CONFIG_VIDEO_YACD5B1S_MODULE)) 
+#if (defined(CONFIG_VIDEO_YACD5B1S) || defined(CONFIG_VIDEO_YACD5B1S_MODULE))
 	{
 		I2C_BOARD_INFO("yacd5b1s", YACD5B1S_I2C_ADDR),
 		.platform_data = &hub_yacd5b1s_platform_data,
@@ -1059,7 +1059,7 @@ static struct omap_musb_board_data musb_board_data = {
 };
 
 //--[[ LGE_UBIQUIX_MODIFIED_START : ymjun@mnbt.co.kr [2012.03.27] - CAM from GB
-#if (defined(CONFIG_VIDEO_IMX072) || defined(CONFIG_VIDEO_IMX072_MODULE)) 
+#if (defined(CONFIG_VIDEO_IMX072) || defined(CONFIG_VIDEO_IMX072_MODULE))
 static struct platform_device hub_rt8515_device = {
 	.name		= "rt8515",
 	.id			= -1,
@@ -1191,7 +1191,7 @@ static struct platform_device hub_modem_device=
 		.id 	= -1,
 };
 #endif // CONFIG_HUB_MODEM_CONTROL
-/* 2011_01_13 by seunghyun.yi@lge.com for FOTA AP - > CP UART4 interface [END]*/  
+/* 2011_01_13 by seunghyun.yi@lge.com for FOTA AP - > CP UART4 interface [END]*/
 
 static struct platform_device *hub_devices[] __initdata = {
 /* 20100326 junyeop.kim@lge.com for headset device */
@@ -1212,7 +1212,7 @@ static struct platform_device *hub_devices[] __initdata = {
 // 20100624 taehwan.kim@lge.com, add the charger platform device [END_LGE]
 
 //--[[ LGE_UBIQUIX_MODIFIED_START : ymjun@mnbt.co.kr [2012.03.27] - CAM from GB
-#if (defined(CONFIG_VIDEO_IMX072) || defined(CONFIG_VIDEO_IMX072_MODULE)) 
+#if (defined(CONFIG_VIDEO_IMX072) || defined(CONFIG_VIDEO_IMX072_MODULE))
 	&flash_rt8515_device, 		// 20100426 hyungwoo.ku@lge.com Flash driver for camera
 	&hub_rt8515_device,		// 20100426 hyungwoo.ku@lge.com Flash driver for camera
 #endif
@@ -1222,7 +1222,7 @@ static struct platform_device *hub_devices[] __initdata = {
 #ifdef CONFIG_HUB_VIBRATOR
 	&hub_vibrator_device,
 #endif
-	
+
 	&hub_reset_keys_device,
 
 /* LGE_UPDATE_S, jaewoo56.lee@lge.com, Bluetooth for Broadcom */
@@ -1257,7 +1257,7 @@ static struct platform_device *hub_devices[] __initdata = {
 #endif
 // 20101121 BT: dohyung10.lee@lge.com - For the BD Address Read /write [End]
 
-/* 2011_01_13 by seunghyun.yi@lge.com for FOTA AP - > CP UART4 interface [Start]*/ 
+/* 2011_01_13 by seunghyun.yi@lge.com for FOTA AP - > CP UART4 interface [Start]*/
 #ifdef CONFIG_HUB_MODEM_CONTROL
 	&hub_modem_device,
 #endif
@@ -1269,7 +1269,7 @@ static struct platform_device *hub_devices[] __initdata = {
 #endif
 #if defined (CONFIG_USIF)
 	&usif_dev,
-#endif	
+#endif
 // kibum.lee@lge.com 20120502 MUIC re-work
 };
 
@@ -1304,9 +1304,9 @@ static struct omap2_mcspi_device_config ifxn721_mcspi2_config = {
 #ifdef CONFIG_LGE_SPI_SLAVE /* 20110308 dongyu.gwak@lge.com Lab3 SPI Slave Compile*/
 	.single_channel = 0,	/* 0: slave, 1: master */
 #else
-//LGE_UPDATED_S [eungbo.shim.lge.com] -- Changed Master OMAP3-IFX For A-Project 
+//LGE_UPDATED_S [eungbo.shim.lge.com] -- Changed Master OMAP3-IFX For A-Project
 	.single_channel = 1,
-//LGE_UPDATED_E [eungbo.shim.lge.com] -- Changed Master OMAP3-IFX For A-Project	
+//LGE_UPDATED_E [eungbo.shim.lge.com] -- Changed Master OMAP3-IFX For A-Project
 #endif
 };
 
@@ -1349,12 +1349,12 @@ static struct omap2_mcspi_device_config fc8050_mcspi_config = {
 
 static struct spi_board_info hub_tdmb_spi_board_info[] __initdata = {
 	[0] = {
-	       .modalias = "tdmb_fc8050",	
+	       .modalias = "tdmb_fc8050",
 	       .bus_num = SPI_TDMB_BUS_NUM,
-	       .chip_select = 0,	
-	       .max_speed_hz = 24000*1000,	
-	       .controller_data = &fc8050_mcspi_config,	
-	       .irq = OMAP_GPIO_IRQ(HUB_TDMB_IRQ_GPIO),	
+	       .chip_select = 0,
+	       .max_speed_hz = 24000*1000,
+	       .controller_data = &fc8050_mcspi_config,
+	       .irq = OMAP_GPIO_IRQ(HUB_TDMB_IRQ_GPIO),
 	      },
 };
 #endif /* CONFIG_LGE_BROADCAST_FC8050 */
